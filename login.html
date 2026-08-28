@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Login — 360 MOVE Uluwatu</title>
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32">
+<link rel="icon" href="assets/favicon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/favicon-180.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<a href="index.html" class="back-home">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  Back to site
+</a>
+
+<main class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-logo"><img src="assets/logo.png" alt="360 MOVE logo"></div>
+    <h1>Member Login</h1>
+    <p class="sub">Enter your Member ID — no password needed.</p>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="memberId">Member ID</label>
+        <input type="text" id="memberId" placeholder="e.g. 360-MV0001" autocomplete="off">
+      </div>
+      <div class="field-error" id="loginError">We couldn't find that Member ID. Check the code on your digital card and try again.</div>
+      <button type="submit" class="btn btn-gold btn-block">Log In</button>
+    </form>
+
+    <p class="auth-foot">Not a member yet? <a href="join.html">Join us</a> · Try the demo ID <strong style="color:var(--grey-200);">360-DEMO01</strong></p>
+  </div>
+</main>
+
+<script src="js/store.js"></script>
+<script>
+  document.getElementById('loginForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const id = document.getElementById('memberId').value.trim();
+    const err = document.getElementById('loginError');
+    if(!id){ err.style.display='block'; err.textContent='Enter your Member ID to continue.'; return; }
+    const m = Auth.loginMember(id);
+    if(!m){
+      err.style.display='block';
+      err.textContent = "We couldn't find that Member ID. Check the code on your digital card and try again.";
+      return;
+    }
+    location.href = 'member.html';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — 360 MOVE Uluwatu</title>
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32">
+<link rel="icon" href="assets/favicon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/favicon-180.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="admin">
+  <aside class="admin-side">
+    <div class="admin-brand">
+      <img src="assets/logo.png" alt="360 MOVE logo">
+      <span>360 MOVE Admin</span>
+    </div>
+    <nav class="admin-nav" id="adminNav">
+      <button data-panel="overview" class="is-active">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V10M12 19V5M20 19v-7"/></svg>
+        Overview
+      </button>
+      <button data-panel="members">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 19a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="8.5" r="2.6"/><path d="M15.7 12a5.5 5.5 0 0 1 5.8 5.4"/></svg>
+        Members
+      </button>
+      <button data-panel="checkin">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M20 14v3h-3M20 21h-3"/></svg>
+        Check-in
+      </button>
+      <button data-panel="promo">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 19 4v16L3 13Z"/><path d="M7 13v5a2 2 0 0 0 2 2h1v-6"/></svg>
+        Promo / Event
+      </button>
+      <button data-panel="pricing">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Pricing
+      </button>
+    </nav>
+    <div class="admin-foot">
+      <div class="who" id="whoAmI"></div>
+      <button class="btn btn-line btn-block btn-sm" id="logoutBtn">Log Out</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+
+    <!-- ============ OVERVIEW ============ -->
+    <section class="admin-panel is-active" id="panel-overview">
+      <div class="admin-topbar">
+        <div>
+          <h1>Overview</h1>
+          <p>Membership &amp; check-in activity at a glance.</p>
+        </div>
+        <div class="filter-row">
+          <select id="ovMonth"></select>
+          <select id="ovYear"></select>
+          <button class="btn btn-line btn-sm" id="ovDownload">⬇ Download</button>
+          <button class="btn btn-gold btn-sm" id="ovExport">Export CSV</button>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="n" id="statTotal">0</div><div class="l">Total Members</div></div>
+        <div class="stat-card"><div class="n" id="statActive">0</div><div class="l">Active Members</div></div>
+        <div class="stat-card"><div class="n" id="statExpired">0</div><div class="l">Expired Members</div></div>
+        <div class="stat-card"><div class="n" id="statCheckins">0</div><div class="l">Check-ins in period</div></div>
+      </div>
+
+      <div class="card-box">
+        <h3>New members in period</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Member ID</th><th>Name</th><th>Package</th><th>Joined</th></tr></thead>
+            <tbody id="ovMembersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MEMBERS ============ -->
+    <section class="admin-panel" id="panel-members">
+      <div class="admin-topbar">
+        <div>
+          <h1>Members</h1>
+          <p>Add, review and manage every member record.</p>
+        </div>
+        <div class="filter-row">
+          <select id="memMonth"></select>
+          <select id="memYear"></select>
+          <button class="btn btn-line btn-sm" id="memDownload">⬇ Download</button>
+          <button class="btn btn-gold btn-sm" id="memExport">Export CSV</button>
+          <button class="btn btn-dark btn-sm" id="addMemberBtn">+ Add Member</button>
+        </div>
+      </div>
+
+      <div class="card-box">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Member ID</th><th>Name</th><th>Package</th><th>Status</th><th>Expiry</th><th>Card</th><th>Details</th><th></th></tr>
+            </thead>
+            <tbody id="membersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CHECK-IN ============ -->
+    <section class="admin-panel" id="panel-checkin">
+      <div class="admin-topbar">
+        <div>
+          <h1>✅ Check-in</h1>
+          <p>Scan a member's QR or enter their Member ID manually.</p>
+        </div>
+      </div>
+
+      <div class="checkin-grid">
+        <div class="card-box">
+          <h3>Scan or enter Member ID</h3>
+          <div class="scan-box" id="scanBox">
+            <video id="scanVideo" playsinline muted style="display:none;"></video>
+            <div class="scan-hint" id="scanHint">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="margin:0 auto 10px;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h7v7h-7z"/></svg>
+              Camera scanning starts here.<br>Needs camera permission on a compatible device.
+            </div>
+          </div>
+          <button class="btn btn-line btn-block" id="scanToggle" style="margin-top:14px;">📷 Start Camera Scan</button>
+          <div class="divider-or">or</div>
+          <form id="manualForm">
+            <div class="field" style="margin-top:0;">
+              <label for="manualId">Member ID</label>
+              <input type="text" id="manualId" placeholder="e.g. 360-MV0001">
+            </div>
+            <button type="submit" class="btn btn-gold btn-block" style="margin-top:16px;">Look Up Member</button>
+          </form>
+        </div>
+
+        <div>
+          <div class="card-box" style="padding:0;overflow:hidden;">
+            <div class="verify-card" id="verifyCard">
+              <div class="verify-placeholder">Scan a QR or enter a Member ID to see verification details here.</div>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <h3>Today's Check-in Log</h3>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th>Time</th><th>Member</th><th>Package</th><th>Status</th></tr></thead>
+                <tbody id="dailyLogBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROMO / EVENT ============ -->
+    <section class="admin-panel" id="panel-promo">
+      <div class="admin-topbar">
+        <div>
+          <h1>Promo / Event</h1>
+          <p>Upload artwork and manage what shows on the public site.</p>
+        </div>
+      </div>
+
+      <div class="card-box">
+        <h3>Add new promo or event</h3>
+        <form id="promoForm">
+          <label class="upload-box" for="promoImg">
+            <div id="uploadPreviewText">Click to upload artwork (JPG/PNG)</div>
+            <img id="uploadPreviewImg" style="display:none;max-height:160px;margin:14px auto 0;border-radius:8px;">
+          </label>
+          <input type="file" id="promoImg" accept="image/*" style="display:none;">
+          <div class="field">
+            <label for="promoTitle">Title</label>
+            <input type="text" id="promoTitle" placeholder="e.g. Anniversary Week">
+          </div>
+          <div class="field">
+            <label for="promoDesc">Description</label>
+            <input type="text" id="promoDesc" placeholder="Short description shown on the site">
+          </div>
+          <button type="submit" class="btn btn-gold" style="margin-top:20px;">Publish to Website</button>
+        </form>
+      </div>
+
+      <div class="card-box">
+        <h3>Live on website</h3>
+        <div class="promo-admin-grid" id="promoAdminGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ PRICING ============ -->
+    <section class="admin-panel" id="panel-pricing">
+      <div class="admin-topbar">
+        <div>
+          <h1>Pricing &amp; Discounts</h1>
+          <p>Edit membership prices and the 5-tier discount system. Changes go live on the public site immediately.</p>
+        </div>
+      </div>
+
+      <div id="pricingGroups"></div>
+
+      <div class="card-box">
+        <h3>Discount Tiers (5 tiers, adjustable)</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Tier</th><th>Label</th><th>Discount %</th></tr></thead>
+            <tbody id="discountBody"></tbody>
+          </table>
+        </div>
+        <button class="btn btn-gold btn-sm" id="saveDiscountsBtn" style="margin-top:18px;">Save Discount Tiers</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ MODAL: Add Member ============ -->
+<div class="modal-veil" id="modalAddMember">
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h2>Add New Member</h2>
+    <form id="addMemberForm">
+      <div class="field" style="margin-top:0;">
+        <label for="nmName">Full name</label>
+        <input type="text" id="nmName" required>
+      </div>
+      <div class="field">
+        <label for="nmPhone">Phone</label>
+        <input type="tel" id="nmPhone" required>
+      </div>
+      <div class="field">
+        <label for="nmPackage">Membership package</label>
+        <select id="nmPackage"></select>
+      </div>
+      <div class="field">
+        <label for="nmDuration">Duration (days)</label>
+        <input type="number" id="nmDuration" value="30" min="1">
+      </div>
+      <div class="field">
+        <label for="nmDiscount">Discount tier</label>
+        <select id="nmDiscount"></select>
+      </div>
+      <button type="submit" class="btn btn-gold btn-block" style="margin-top:24px;">Register &amp; Generate Member ID</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: Member Registered (auto card prompt) ============ -->
+<div class="modal-veil" id="modalRegistered">
+  <div class="modal" style="max-width:420px;text-align:center;">
+    <button class="modal-close" data-close>&times;</button>
+    <div class="ic-ok" style="margin:0 auto 18px;"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h2 style="justify-content:center;">Member Registered</h2>
+    <p style="color:var(--grey-400);font-size:13.5px;margin-bottom:22px;">Member ID <strong style="color:var(--gold);font-family:var(--font-mono);" id="newMemberId"></strong> has been created.</p>
+    <button class="btn btn-gold btn-block" id="genCardBtn">🪪 Generate Digital Card</button>
+  </div>
+</div>
+
+<!-- ============ MODAL: Digital Card ============ -->
+<div class="modal-veil" id="modalCard">
+  <div class="modal" style="max-width:420px;">
+    <button class="modal-close" data-close>&times;</button>
+    <h2>Digital Member Card</h2>
+    <div class="modal-card-wrap">
+      <div class="dcard" id="dcardEl">
+        <div class="dcard-head"><img src="assets/logo.png" alt="logo"><span>360 MOVE</span></div>
+        <div class="dcard-body">
+          <div class="dcard-qr" id="dcardQr"></div>
+          <div class="dcard-status" id="dcardStatus"></div>
+          <div class="dcard-id" id="dcardId"></div>
+          <div class="dcard-name" id="dcardName"></div>
+          <div class="dcard-pkg" id="dcardPkg"></div>
+          <div class="dcard-exp" id="dcardExp"></div>
+        </div>
+      </div>
+      <div class="modal-card-actions">
+        <button class="btn btn-gold btn-sm" id="downloadCardBtn">⬇ Download PNG</button>
+        <button class="btn btn-line btn-sm" id="waCardBtn">📱 Send via WhatsApp</button>
+      </div>
+      <p style="font-size:11.5px;color:var(--grey-400);text-align:center;">PNG exports at 1080 × 1350px. WhatsApp opens a chat with the member's info — attach the downloaded PNG manually.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: Member Details & History ============ -->
+<div class="modal-veil" id="modalDetails">
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h2>Member Details</h2>
+    <div class="detail-grid" id="detailGrid"></div>
+    <h3 style="font-family:var(--font-display);font-size:15px;margin-bottom:12px;">Check-in History</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Date</th><th>Time</th><th>Package</th><th>Status</th></tr></thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/store.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/firebase-auth.js"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/supabase-storage.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

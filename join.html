@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join 360 MOVE Uluwatu</title>
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32">
+<link rel="icon" href="assets/favicon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/favicon-180.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.png" alt="360 MOVE logo">
+      <span>360 MOVE</span>
+    </a>
+    <nav class="nav-menu">
+      <a href="index.html#about">About</a>
+      <a href="index.html#services">Our Service</a>
+      <a href="index.html#membership">Membership</a>
+      <a href="index.html#promo">Promo</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html" class="btn btn-line btn-sm">Login</a>
+      <button class="nav-burger" aria-label="Open menu" id="burgerBtn"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html#about">About</a>
+  <a href="index.html#services">Our Service</a>
+  <a href="index.html#membership">Membership</a>
+  <a href="index.html#promo">Promo</a>
+  <a href="index.html#contact">Contact</a>
+</div>
+
+<main class="join-shell">
+  <div class="steps">
+    <div class="step" data-step="1">1. Choose Package</div>
+    <div class="step" data-step="2">2. Your Details</div>
+    <div class="step" data-step="3">3. Sent to Reception</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <section id="step1">
+    <div class="section-head" style="margin:0 auto 36px;text-align:center;max-width:520px;">
+      <h2 style="font-size:clamp(26px,4vw,36px);">Which package fits your training?</h2>
+    </div>
+    <div id="pickGroups"></div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section id="step2" style="display:none;">
+    <div class="form-card">
+      <div class="eyebrow" style="margin-bottom:14px;">Selected package</div>
+      <div id="selectedPlanName" style="font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--gold);"></div>
+      <form id="joinForm">
+        <div class="field">
+          <label for="fName">Full name</label>
+          <input type="text" id="fName" required placeholder="e.g. Kadek Wirawan">
+        </div>
+        <div class="field">
+          <label for="fPhone">Phone number</label>
+          <input type="tel" id="fPhone" required placeholder="e.g. 0812-3456-7890">
+        </div>
+        <button type="submit" class="btn btn-gold btn-block">Send to Admin / Reception</button>
+        <button type="button" class="btn btn-line btn-block" style="margin-top:10px;" id="backToStep1">Back</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section id="step3" style="display:none;">
+    <div class="summary-card">
+      <div class="ic-ok"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <h2 style="font-family:var(--font-display);font-weight:700;font-size:26px;">You're on your way in.</h2>
+      <p style="color:var(--grey-400);margin-top:12px;font-size:14.5px;">Thanks <strong id="doneName" style="color:var(--white-pure);"></strong> — your request for <strong id="donePlan" style="color:var(--gold);"></strong> has been forwarded to our admin team. They'll confirm your Member ID and set up your digital card in person or over WhatsApp.</p>
+      <div class="hero-cta" style="justify-content:center;margin-top:28px;">
+        <a href="#" id="waHandoff" class="btn btn-gold" target="_blank" rel="noopener">Message Reception on WhatsApp</a>
+        <a href="index.html" class="btn btn-line">Back to Home</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="js/store.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  let selectedPlan = null;
+  const groups = DB.packageGroups();
+  const preselectGroup = params.get('group');
+
+  const pickGroups = document.getElementById('pickGroups');
+  groups.forEach(g=>{
+    const wrap = document.createElement('div');
+    wrap.style.marginBottom = '40px';
+    wrap.innerHTML = `<div class="eyebrow" style="justify-content:center;margin-bottom:16px;">${g.category} — ${g.subtitle}</div>`;
+    const grid = document.createElement('div');
+    grid.className = 'package-pick';
+    wrap.appendChild(grid);
+    pickGroups.appendChild(wrap);
+
+    g.tiers.forEach(t=>{
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'pick-card';
+      card.innerHTML = `<div class="name">${t.name}</div><div class="price">${formatIDR(t.price)}</div><div style="font-size:12.5px;color:var(--grey-400);margin-top:10px;">${g.category}</div>`;
+      const plan = { name: `${g.category} — ${t.name}`, price: t.price };
+      card.addEventListener('click', ()=> choosePlan(plan, card));
+      grid.appendChild(card);
+      if(preselectGroup === g.id && g.tiers[0].id === t.id){ choosePlan(plan, card); }
+    });
+  });
+
+  function setStep(n){
+    document.querySelectorAll('.step').forEach(s=>{
+      const step = Number(s.dataset.step);
+      s.classList.toggle('is-active', step===n);
+      s.classList.toggle('is-done', step<n);
+    });
+    document.getElementById('step1').style.display = n===1 ? 'block' : 'none';
+    document.getElementById('step2').style.display = n===2 ? 'block' : 'none';
+    document.getElementById('step3').style.display = n===3 ? 'block' : 'none';
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  function choosePlan(p, card){
+    selectedPlan = p;
+    document.querySelectorAll('.pick-card').forEach(c=>c.classList.remove('is-selected'));
+    card.classList.add('is-selected');
+    document.getElementById('selectedPlanName').textContent = p.name + ' — ' + formatIDR(p.price);
+    setStep(2);
+  }
+
+  document.getElementById('backToStep1').addEventListener('click', ()=> setStep(1));
+
+  document.getElementById('joinForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('fName').value.trim();
+    const phone = document.getElementById('fPhone').value.trim();
+    if(!name || !phone) return;
+
+    document.getElementById('doneName').textContent = name;
+    document.getElementById('donePlan').textContent = selectedPlan.name;
+
+    const msg = `Hi 360 MOVE! I'd like to join.%0AName: ${encodeURIComponent(name)}%0APhone: ${encodeURIComponent(phone)}%0APackage: ${encodeURIComponent(selectedPlan.name)}`;
+    document.getElementById('waHandoff').href = `https://wa.me/6282144816669?text=${msg}`;
+
+    setStep(3);
+  });
+
+  setStep(1);
+</script>
+</body>
+</html>
