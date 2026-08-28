@@ -32,7 +32,7 @@ No build step — it's static HTML/CSS/JS.
 
 ## Demo logins
 
-- **Member:** Member ID `360-DEMO01` (or any seeded ID, e.g. `360-MV0001`) on `login.html`.
+- **Member:** Member ID `360-DEMO99` (or any seeded ID, e.g. `360-MV0001`) on `login.html`.
 - **Admin:** `admin@360move.com` / `360move2026` on `admin-login.html` (used automatically until Firebase is configured — see below).
 
 ## Connecting your own backend (Firebase + Supabase)

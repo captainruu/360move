@@ -438,6 +438,9 @@ h1,h2,h3,h4,p{ margin:0; }
   border:1px solid rgba(247,246,242,.14); background:var(--black); color:var(--white);
   font-size:14.5px;
 }
+.field input.mono-input{
+  font-family:var(--font-mono); letter-spacing:.04em; text-transform:uppercase;
+}
 .field input:focus, .field select:focus{ border-color:var(--gold); }
 .field-error{ color:#e2897b; font-size:12.5px; margin-top:8px; display:none; }
 .auth-card .btn{ margin-top:26px; }
@@ -554,6 +557,13 @@ td .idm{ font-family:var(--font-mono); color:var(--gold); }
 .scan-box{ aspect-ratio:1/1; background:var(--black); border-radius:14px; border:1px dashed rgba(247,246,242,.16); display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; }
 .scan-box video{ width:100%; height:100%; object-fit:cover; }
 .scan-hint{ position:absolute; text-align:center; color:var(--grey-400); font-size:12.5px; padding:20px; }
+.scan-reticle{
+  position:absolute; inset:14%;
+  border:2px solid var(--gold);
+  border-radius:16px;
+  box-shadow:0 0 0 999px rgba(11,11,12,.35);
+  pointer-events:none;
+}
 .divider-or{ display:flex; align-items:center; gap:12px; margin:18px 0; color:var(--grey-400); font-size:12px; font-family:var(--font-mono); text-transform:uppercase; }
 .divider-or::before, .divider-or::after{ content:''; flex:1; height:1px; background:rgba(247,246,242,.1); }
 

@@ -356,11 +356,36 @@ document.addEventListener('DOMContentLoaded', ()=>{
   scanToggle.addEventListener('click', async ()=>{
     if(scanning){ stopScan(); return; }
     try{
-      scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      // Ask for a moderate resolution — high-res camera streams make every
+      // frame expensive to scan on phones, which was causing scans to feel
+      // like they "never" detect a code. 720p is plenty for a QR a few
+      // inches from the lens and scans noticeably faster on mobile.
+      scanStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      });
       video.srcObject = scanStream;
       video.style.display = 'block';
       scanHint.style.display = 'none';
+      document.getElementById('scanReticle').style.display = 'block';
       await video.play();
+
+      // Best-effort: ask for continuous autofocus. Browsers focus far less
+      // aggressively than native camera apps by default, which was the
+      // main reason scans looked blurry compared to the phone's own
+      // camera app. Silently ignored on devices/browsers that don't
+      // support it (no downside to trying).
+      try{
+        const track = scanStream.getVideoTracks()[0];
+        const caps = track.getCapabilities ? track.getCapabilities() : {};
+        if(caps.focusMode && caps.focusMode.includes('continuous')){
+          await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+        }
+      }catch(focusErr){ /* not supported — no-op */ }
+
       scanning = true;
       scanToggle.textContent = '⏹ Stop Camera Scan';
       requestAnimationFrame(scanLoop);
@@ -373,19 +398,44 @@ document.addEventListener('DOMContentLoaded', ()=>{
     scanning = false;
     if(scanStream){ scanStream.getTracks().forEach(t=>t.stop()); scanStream = null; }
     video.style.display = 'none';
+    document.getElementById('scanReticle').style.display = 'none';
     scanHint.style.display = 'block';
     scanToggle.textContent = '📷 Start Camera Scan';
   }
 
+  // Tap the video to nudge the camera into refocusing — helpful on phones
+  // where autofocus doesn't kick in fast enough after the stream starts.
+  video.addEventListener('click', async ()=>{
+    if(!scanStream) return;
+    try{
+      const track = scanStream.getVideoTracks()[0];
+      const caps = track.getCapabilities ? track.getCapabilities() : {};
+      if(caps.focusMode && caps.focusMode.includes('single-shot')){
+        await track.applyConstraints({ advanced: [{ focusMode: 'single-shot' }] });
+      }else if(caps.focusMode && caps.focusMode.includes('continuous')){
+        await track.applyConstraints({ advanced: [{ focusMode: 'manual' }] });
+        await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+      }
+    }catch(err){ /* not supported — no-op */ }
+  });
+
+  // willReadFrequently hints the browser to optimize this canvas for
+  // repeated getImageData() calls, which noticeably helps scan speed on
+  // mobile Chrome/Safari.
   const canvasEl = document.createElement('canvas');
+  const canvasCtx = canvasEl.getContext('2d', { willReadFrequently: true });
+  const SCAN_MAX_DIM = 700; // downscale each frame before decoding — faster, and still plenty of detail for a QR filling most of the frame
+
   function scanLoop(){
     if(!scanning) return;
-    if(video.readyState === video.HAVE_ENOUGH_DATA){
-      canvasEl.width = video.videoWidth; canvasEl.height = video.videoHeight;
-      const ctx = canvasEl.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvasEl.width, canvasEl.height);
-      const imgData = ctx.getImageData(0, 0, canvasEl.width, canvasEl.height);
-      const code = jsQR(imgData.data, imgData.width, imgData.height);
+    if(video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth){
+      const scale = Math.min(1, SCAN_MAX_DIM / Math.max(video.videoWidth, video.videoHeight));
+      const w = Math.round(video.videoWidth * scale);
+      const h = Math.round(video.videoHeight * scale);
+      canvasEl.width = w; canvasEl.height = h;
+      canvasCtx.drawImage(video, 0, 0, w, h);
+      const imgData = canvasCtx.getImageData(0, 0, w, h);
+      const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
       if(code && code.data){
         const id = code.data.trim().toUpperCase();
         stopScan();

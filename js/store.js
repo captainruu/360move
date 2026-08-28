@@ -20,7 +20,7 @@
 // that should reach browsers that already have older demo data saved locally
 // (pricing, promo artwork, etc). Old versions are simply ignored/orphaned —
 // no migration needed for this demo data layer.
-const STORE_KEY = '360move_db_v2';
+const STORE_KEY = '360move_db_v4';
 const SESSION_KEY = '360move_admin_session';
 const MEMBER_SESSION_KEY = '360move_member_session';
 
@@ -37,7 +37,7 @@ function seedData(){
       { memberId:'360-MV0002', name:'Sarah Whitfield', phone:'0812-3456-7002', membershipPackage:'3-Month Performance', status:'Active', expiryDate:plus(58), createdAt:minus(32) },
       { memberId:'360-MV0003', name:'Made Surya', phone:'0812-3456-7003', membershipPackage:'Annual All-Access', status:'Active', expiryDate:plus(210), createdAt:minus(155) },
       { memberId:'360-MV0004', name:'Léa Dubois', phone:'0812-3456-7004', membershipPackage:'Drop-In 10 Pass', status:'Expired', expiryDate:minus(11), createdAt:minus(70) },
-      { memberId:'360-DEMO01', name:'Demo Member', phone:'0812-0000-0000', membershipPackage:'Monthly Unlimited', status:'Active', expiryDate:plus(19), createdAt:minus(10) }
+      { memberId:'360-DEMO99', name:'Demo Member', phone:'0812-0000-0000', membershipPackage:'Monthly Unlimited', status:'Active', expiryDate:plus(19), createdAt:minus(10) }
     ],
     checkins: [
       { id:'c1', memberId:'360-MV0001', name:'Kadek Wirawan', package:'Monthly Unlimited', status:'Active', date:todayISO(), time:'07:12' },
@@ -88,8 +88,7 @@ function seedData(){
       { tier:4, label:'Tier 4', percent:15 },
       { tier:5, label:'Tier 5', percent:20 }
     ],
-    admin: { email:'admin@360move.com', password:'360move2026' },
-    seq: 5
+    admin: { email:'admin@360move.com', password:'360move2026' }
   };
 }
 
@@ -106,6 +105,18 @@ function loadDB(){
 }
 function saveDB(db){ localStorage.setItem(STORE_KEY, JSON.stringify(db)); }
 
+// Character set for generated Member IDs — deliberately excludes visually
+// ambiguous characters (0/O, 1/I/L) so staff and members can read and type
+// IDs correctly off a printed card or a phone screen without guesswork.
+const SAFE_ID_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+function genSafeCode(length = 6){
+  let out = '';
+  for(let i = 0; i < length; i++){
+    out += SAFE_ID_CHARS[Math.floor(Math.random() * SAFE_ID_CHARS.length)];
+  }
+  return out;
+}
+
 const DB = {
   all(){ return loadDB(); },
 
@@ -114,8 +125,10 @@ const DB = {
   getMember(memberId){ return loadDB().members.find(m=>m.memberId===memberId) || null; },
   addMember({name, phone, membershipPackage, durationDays=30, discountTier=0}){
     const db = loadDB();
-    db.seq += 1;
-    const memberId = '360-MV' + String(db.seq).padStart(4,'0');
+    let memberId;
+    do{
+      memberId = '360-' + genSafeCode(6);
+    }while(db.members.some(m => m.memberId === memberId));
     const expiry = new Date(); expiry.setDate(expiry.getDate() + Number(durationDays||30));
     const tierInfo = db.discountTiers.find(t=>t.tier===Number(discountTier));
     const member = {

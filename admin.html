@@ -7,7 +7,7 @@
 <link rel="icon" href="assets/favicon-32.png" sizes="32x32">
 <link rel="icon" href="assets/favicon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="assets/favicon-180.png">
-<link rel="stylesheet" href="css/style.css?v=6">
+<link rel="stylesheet" href="css/style.css?v=9">
 </head>
 <body>
 
@@ -122,17 +122,19 @@
           <h3>Scan or enter Member ID</h3>
           <div class="scan-box" id="scanBox">
             <video id="scanVideo" playsinline muted style="display:none;"></video>
+            <div class="scan-reticle" id="scanReticle" style="display:none;"></div>
             <div class="scan-hint" id="scanHint">
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="margin:0 auto 10px;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h7v7h-7z"/></svg>
               Camera scanning starts here.<br>Needs camera permission on a compatible device.
             </div>
           </div>
           <button class="btn btn-line btn-block" id="scanToggle" style="margin-top:14px;">📷 Start Camera Scan</button>
+          <p style="font-size:11.5px;color:var(--grey-400);margin-top:8px;text-align:center;">Tip: tap the camera preview to refocus if the code looks blurry.</p>
           <div class="divider-or">or</div>
           <form id="manualForm">
             <div class="field" style="margin-top:0;">
               <label for="manualId">Member ID</label>
-              <input type="text" id="manualId" placeholder="e.g. 360-MV0001">
+              <input type="text" id="manualId" class="mono-input" placeholder="e.g. 360-MV0001">
             </div>
             <button type="submit" class="btn btn-gold btn-block" style="margin-top:16px;">Look Up Member</button>
           </form>
@@ -309,11 +311,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="js/store.js?v=6"></script>
-<script src="js/firebase-config.js?v=6"></script>
-<script src="js/firebase-auth.js?v=6"></script>
-<script src="js/supabase-config.js?v=6"></script>
-<script src="js/supabase-storage.js?v=6"></script>
-<script src="js/admin.js?v=6"></script>
+<script src="js/store.js?v=9"></script>
+<script src="js/firebase-config.js?v=9"></script>
+<script src="js/firebase-auth.js?v=9"></script>
+<script src="js/supabase-config.js?v=9"></script>
+<script src="js/supabase-storage.js?v=9"></script>
+<script src="js/admin.js?v=9"></script>
 </body>
 </html>
