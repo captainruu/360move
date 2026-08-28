@@ -263,6 +263,7 @@ h1,h2,h3,h4,p{ margin:0; }
 .orbit-photo img.is-active{ opacity:1; }
 .orbit-chip{
   position:absolute;
+  inset:auto;
   background:var(--black-elev);
   border:1px solid rgba(247,246,242,.1);
   padding:9px 16px;
@@ -270,9 +271,11 @@ h1,h2,h3,h4,p{ margin:0; }
   font-family:var(--font-mono);
   font-size:12px;
   letter-spacing:.04em;
-  display:flex; align-items:center; gap:8px;
+  display:inline-flex; align-items:center; gap:8px;
   box-shadow:var(--shadow-soft);
   white-space:nowrap;
+  width:max-content;
+  height:auto;
 }
 .orbit-chip::before{ content:''; width:6px; height:6px; border-radius:50%; background:var(--gold); }
 .orbit-chip--1{ top:2%; left:-6%; }
