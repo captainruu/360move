@@ -16,7 +16,11 @@
      so the UI layer does not need to change.
    ========================================================================== */
 
-const STORE_KEY = '360move_db_v1';
+// Bump this suffix (v2, v3, ...) whenever seedData() below changes in a way
+// that should reach browsers that already have older demo data saved locally
+// (pricing, promo artwork, etc). Old versions are simply ignored/orphaned —
+// no migration needed for this demo data layer.
+const STORE_KEY = '360move_db_v2';
 const SESSION_KEY = '360move_admin_session';
 const MEMBER_SESSION_KEY = '360move_member_session';
 
