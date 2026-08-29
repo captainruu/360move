@@ -366,6 +366,10 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
   scanToggle.addEventListener('click', async ()=>{
     if(scanning){ stopScan(); return; }
+    if(typeof jsQR !== 'function'){
+      toast('QR scanner library failed to load — check your connection and reload the page');
+      return;
+    }
     try{
       // Ask for the camera's higher resolution — since we now only analyze
       // the small cropped region inside the reticle (see scanLoop below)
