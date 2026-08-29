@@ -17,6 +17,23 @@
 const FirebaseAdminAuth = {
   isLive(){ return isFirebaseConfigured() && typeof firebase !== 'undefined'; },
 
+  // Maps Firebase's error codes to plain, brand-neutral messages — the raw
+  // err.message (e.g. "Firebase: Error (auth/wrong-password).") is never
+  // shown to the person signing in.
+  _friendlyError(err){
+    const code = err && err.code ? err.code : '';
+    const map = {
+      'auth/wrong-password': 'Incorrect email or password.',
+      'auth/user-not-found': 'Incorrect email or password.',
+      'auth/invalid-credential': 'Incorrect email or password.',
+      'auth/invalid-email': "That doesn't look like a valid email address.",
+      'auth/too-many-requests': 'Too many attempts — please wait a moment and try again.',
+      'auth/network-request-failed': 'Network error — check your connection and try again.',
+      'auth/user-disabled': 'This account has been disabled.'
+    };
+    return map[code] || 'Login failed. Please try again.';
+  },
+
   // Returns { ok: boolean, error?: string }
   async login(email, password){
     if(this.isLive()){
@@ -26,7 +43,7 @@ const FirebaseAdminAuth = {
         sessionStorage.setItem(SESSION_KEY, JSON.stringify({ email, loggedAt: Date.now(), via:'firebase' }));
         return { ok:true };
       }catch(err){
-        return { ok:false, error: err.message || 'Login failed.' };
+        return { ok:false, error: this._friendlyError(err) };
       }
     }
     // ---- Fallback: local demo auth (see js/store.js) ----

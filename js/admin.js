@@ -554,8 +554,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   const promoStorageNote = document.createElement('p');
   promoStorageNote.style.cssText = 'font-size:11.5px;color:var(--grey-400);margin-top:10px;';
   promoStorageNote.textContent = PromoStorage.isLive()
-    ? 'Artwork uploads to Supabase Storage.'
-    : 'Supabase not configured yet — artwork is stored locally for this demo (see js/supabase-config.js).';
+    ? 'Artwork uploads to secure cloud storage.'
+    : 'Cloud storage not configured yet — artwork is stored locally for this demo.';
   document.getElementById('promoForm').appendChild(promoStorageNote);
 
   document.getElementById('promoForm').addEventListener('submit', async (e)=>{
