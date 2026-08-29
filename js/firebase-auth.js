@@ -39,5 +39,28 @@ const FirebaseAdminAuth = {
       try{ getFirebaseApp(); await firebase.auth().signOut(); }catch(err){ /* no-op */ }
     }
     Auth.logoutAdmin();
+  },
+
+  // Firebase Auth restores the signed-in session asynchronously on every
+  // fresh page load (it takes a brief moment even though sign-in itself
+  // already happened on a previous page). Firestore requests fired before
+  // that restoration completes go out unauthenticated and get rejected by
+  // security rules that require request.auth != null — which showed up as
+  // "Membership Package" and other admin dropdowns loading empty. Call
+  // this and await it before making any Firestore-backed DB.* call on a
+  // page load.
+  _readyPromise: null,
+  waitForReady(){
+    if(!this.isLive()) return Promise.resolve(null);
+    if(!this._readyPromise){
+      this._readyPromise = new Promise((resolve)=>{
+        getFirebaseApp();
+        const unsubscribe = firebase.auth().onAuthStateChanged((user)=>{
+          unsubscribe();
+          resolve(user);
+        });
+      });
+    }
+    return this._readyPromise;
   }
 };

@@ -8,6 +8,10 @@ if(!Auth.isAdminLoggedIn()){
 }
 
 document.addEventListener('DOMContentLoaded', async ()=>{
+  // Wait for Firebase Auth's session to actually be restored on this fresh
+  // page load before touching Firestore — see waitForReady() for why.
+  await FirebaseAdminAuth.waitForReady();
+
   const creds = DB.adminCreds();
   document.getElementById('whoAmI').textContent = creds.email;
 
@@ -174,7 +178,11 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     });
   }
 
-  openModal('addMemberBtn', 'modalAddMember');
+  document.getElementById('addMemberBtn').addEventListener('click', ()=>{
+    openModalEl(document.getElementById('modalAddMember'));
+    fillPackageSelect();
+    fillDiscountSelect();
+  });
 
   document.getElementById('addMemberForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
@@ -640,9 +648,6 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   /* ==========================================================
      MODAL helpers
      ========================================================== */
-  function openModal(triggerId, modalId){
-    document.getElementById(triggerId).addEventListener('click', ()=> openModalEl(document.getElementById(modalId)));
-  }
   function openModalEl(el){ el.classList.add('is-open'); }
   function closeModal(id){ document.getElementById(id).classList.remove('is-open'); }
   document.querySelectorAll('.modal-veil').forEach(veil=>{
@@ -651,14 +656,19 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   });
 
   // ---- initial render ----
-  await Promise.all([
-    renderOverview(),
-    renderMembers(),
-    renderDailyLog(),
-    renderPromoAdmin(),
-    renderPricing(),
-    renderDiscountTiers(),
-    fillPackageSelect(),
-    fillDiscountSelect()
-  ]);
+  try{
+    await Promise.all([
+      renderOverview(),
+      renderMembers(),
+      renderDailyLog(),
+      renderPromoAdmin(),
+      renderPricing(),
+      renderDiscountTiers(),
+      fillPackageSelect(),
+      fillDiscountSelect()
+    ]);
+  }catch(err){
+    console.error('Dashboard failed to load data:', err);
+    toast('Could not load data — check Firestore rules & console (F12)');
+  }
 });
