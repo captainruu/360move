@@ -256,6 +256,16 @@ const DB = {
     return record;
   },
 
+  async deleteCheckin(id){
+    if(isFirestoreLive()){
+      await getFirestoreDb().collection('checkins').doc(id).delete();
+      return;
+    }
+    const db = loadDB();
+    db.checkins = db.checkins.filter(c=>c.id!==id);
+    saveDB(db);
+  },
+
   async todaysCheckins(){
     const all = await DB.checkins();
     return all.filter(c=>c.date===todayISO());

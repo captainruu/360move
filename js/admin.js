@@ -293,15 +293,47 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     const body = document.getElementById('historyBody');
     body.innerHTML = '';
     if(history.length===0){
-      body.innerHTML = `<tr class="empty-row"><td colspan="4">No check-ins recorded yet.</td></tr>`;
+      body.innerHTML = `<tr class="empty-row"><td colspan="5">No check-ins recorded yet.</td></tr>`;
     }else{
       history.forEach(h=>{
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${formatDate(h.date)}</td><td>${h.time}</td><td>${h.package}</td><td><span class="tag ${h.status==='Active'?'tag-active':'tag-expired'}">${h.status.toUpperCase()}</span></td>`;
+        tr.innerHTML = `<td>${formatDate(h.date)}</td><td>${h.time}</td><td>${h.package}</td><td><span class="tag ${h.status==='Active'?'tag-active':'tag-expired'}">${h.status.toUpperCase()}</span></td><td><button class="icon-btn danger" data-del-history="${h.id}">Remove</button></td>`;
         body.appendChild(tr);
+      });
+      body.querySelectorAll('[data-del-history]').forEach(b=>{
+        b.addEventListener('click', async ()=>{
+          if(!confirm('Remove this check-in entry?')) return;
+          await DB.deleteCheckin(b.dataset.delHistory);
+          openDetailsModal(memberId);
+          renderDailyLog();
+          renderOverview();
+          toast('Check-in entry removed');
+        });
       });
     }
     openModalEl(document.getElementById('modalDetails'));
+  }
+
+  /* ==========================================================
+     Feedback helpers — sound + vibration for scan / check-in events
+     ========================================================== */
+  function playBeep(freq=880, duration=120){
+    try{
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.18, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration/1000);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration/1000);
+      osc.onended = ()=>{ try{ ctx.close(); }catch(e){} };
+    }catch(e){ /* Web Audio unavailable — no-op */ }
+  }
+  function vibrateDevice(pattern){
+    if(navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} }
   }
 
   /* ==========================================================
@@ -312,6 +344,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     card.innerHTML = `<div class="verify-placeholder">Looking up "${memberId}"…</div>`;
     const m = DB.refreshStatus(await DB.getMember(memberId));
     if(!m){
+      playBeep(220, 220);
+      vibrateDevice([100,60,100]);
       card.innerHTML = `<div class="verify-placeholder">No member found for ID "${memberId}". Double-check the code and try again.</div>`;
       return;
     }
@@ -326,8 +360,20 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         <button class="btn btn-gold btn-block" id="doCheckinBtn" style="margin-top:24px;">CHECK IN</button>
       </div>
     `;
-    document.getElementById('doCheckinBtn').addEventListener('click', async ()=>{
+    let checkinInProgress = false;
+    document.getElementById('doCheckinBtn').addEventListener('click', async (e)=>{
+      if(checkinInProgress) return; // guards against double/rapid clicks
+      checkinInProgress = true;
+      const btn = e.target;
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
       await DB.addCheckin(m);
+
+      playBeep(1046, 90);
+      setTimeout(()=> playBeep(1568, 140), 100);
+      vibrateDevice([60,40,60]);
+
       toast(`${m.name} checked in`);
       renderDailyLog();
       renderOverview();
@@ -348,13 +394,22 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     const rows = await DB.todaysCheckins();
     body.innerHTML = '';
     if(rows.length===0){
-      body.innerHTML = `<tr class="empty-row"><td colspan="4">No check-ins yet today.</td></tr>`;
+      body.innerHTML = `<tr class="empty-row"><td colspan="5">No check-ins yet today.</td></tr>`;
       return;
     }
     rows.forEach(c=>{
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${c.time}</td><td>${c.name} <span style="color:var(--grey-400);font-family:var(--font-mono);font-size:11.5px;">(${c.memberId})</span></td><td>${c.package}</td><td><span class="tag ${c.status==='Active'?'tag-active':'tag-expired'}">${c.status.toUpperCase()}</span></td>`;
+      tr.innerHTML = `<td>${c.time}</td><td>${c.name} <span style="color:var(--grey-400);font-family:var(--font-mono);font-size:11.5px;">(${c.memberId})</span></td><td>${c.package}</td><td><span class="tag ${c.status==='Active'?'tag-active':'tag-expired'}">${c.status.toUpperCase()}</span></td><td><button class="icon-btn danger" data-del-checkin="${c.id}">Remove</button></td>`;
       body.appendChild(tr);
+    });
+    body.querySelectorAll('[data-del-checkin]').forEach(b=>{
+      b.addEventListener('click', async ()=>{
+        if(!confirm('Remove this check-in entry? Use this to clean up accidental duplicate check-ins.')) return;
+        await DB.deleteCheckin(b.dataset.delCheckin);
+        renderDailyLog();
+        renderOverview();
+        toast('Check-in entry removed');
+      });
     });
   }
 
@@ -469,6 +524,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
       if(code && code.data){
         const id = code.data.trim().toUpperCase();
         stopScan();
+        playBeep(1200, 100);
+        vibrateDevice(80);
         document.getElementById('manualId').value = id;
         showVerification(id);
         return;
