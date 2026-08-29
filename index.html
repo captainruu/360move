@@ -8,7 +8,7 @@
 <link rel="icon" href="assets/favicon-32.png" sizes="32x32">
 <link rel="icon" href="assets/favicon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="assets/favicon-180.png">
-<link rel="stylesheet" href="css/style.css?v=9">
+<link rel="stylesheet" href="css/style.css?v=11">
 </head>
 <body>
 
@@ -224,51 +224,60 @@
   </div>
 </footer>
 
-<script src="js/store.js?v=9"></script>
-<script src="js/main.js?v=9"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js?v=11"></script>
+<script src="js/firebase-init.js?v=11"></script>
+<script src="js/store.js?v=11"></script>
+<script src="js/main.js?v=11"></script>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
   // ---- Membership pricing (from DB.packageGroups, editable in Admin → Pricing) ----
+  // ---- Membership pricing (from DB.packageGroups, editable in Admin → Pricing) ----
   const priceGrid = document.getElementById('priceGrid');
-  DB.packageGroups().forEach(g=>{
-    const card = document.createElement('div');
-    card.className = 'price-card';
-    card.innerHTML = `
-      <div class="price-card-head">
-        <h3>${g.category}</h3>
-        <p>${g.subtitle}</p>
-      </div>
-      <ul class="price-list">
-        ${g.tiers.map(t=>`
-          <li>
-            <span class="pl-name">${t.name}</span>
-            <span class="pl-price">${formatIDR(t.price)}</span>
-          </li>
-        `).join('')}
-      </ul>
-      ${g.note ? `<p class="price-note">${g.note}</p>` : ''}
-      <a href="join.html?group=${g.id}" class="btn btn-line btn-block">Choose ${g.category}</a>
-    `;
-    priceGrid.appendChild(card);
-  });
-
-  // ---- Promo / event (from DB.promos, managed in admin dashboard) ----
   const promoWrap = document.getElementById('promoWrap');
-  const promos = DB.promos();
-  if(promos.length === 0){
-    promoWrap.innerHTML = `<div class="promo-empty">No promos or events right now — check back soon, or follow @360move_uluwatu for updates.</div>`;
-  }else{
-    const scroller = document.createElement('div');
-    scroller.className = 'promo-scroller';
-    scroller.innerHTML = promos.map(p=>`
-      <div class="promo-card">
-        <div class="img"><img src="${p.img}" alt="${p.title}"></div>
-        <div class="body"><h4>${p.title}</h4><p>${p.desc}</p></div>
-      </div>
-    `).join('');
-    promoWrap.appendChild(scroller);
-  }
+
+  (async ()=>{
+    const groups = await DB.packageGroups();
+    groups.forEach(g=>{
+      const card = document.createElement('div');
+      card.className = 'price-card';
+      card.innerHTML = `
+        <div class="price-card-head">
+          <h3>${g.category}</h3>
+          <p>${g.subtitle}</p>
+        </div>
+        <ul class="price-list">
+          ${g.tiers.map(t=>`
+            <li>
+              <span class="pl-name">${t.name}</span>
+              <span class="pl-price">${formatIDR(t.price)}</span>
+            </li>
+          `).join('')}
+        </ul>
+        ${g.note ? `<p class="price-note">${g.note}</p>` : ''}
+        <a href="join.html?group=${g.id}" class="btn btn-line btn-block">Choose ${g.category}</a>
+      `;
+      priceGrid.appendChild(card);
+    });
+
+    // ---- Promo / event (from DB.promos, managed in admin dashboard) ----
+    const promos = await DB.promos();
+    if(promos.length === 0){
+      promoWrap.innerHTML = `<div class="promo-empty">No promos or events right now — check back soon, or follow @360move_uluwatu for updates.</div>`;
+    }else{
+      const scroller = document.createElement('div');
+      scroller.className = 'promo-scroller';
+      scroller.innerHTML = promos.map(p=>`
+        <div class="promo-card">
+          <div class="img"><img src="${p.img}" alt="${p.title}"></div>
+          <div class="body"><h4>${p.title}</h4><p>${p.desc}</p></div>
+        </div>
+      `).join('');
+      promoWrap.appendChild(scroller);
+    }
+  })();
 </script>
 </body>
 </html>

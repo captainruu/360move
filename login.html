@@ -7,7 +7,7 @@
 <link rel="icon" href="assets/favicon-32.png" sizes="32x32">
 <link rel="icon" href="assets/favicon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="assets/favicon-180.png">
-<link rel="stylesheet" href="css/style.css?v=9">
+<link rel="stylesheet" href="css/style.css?v=11">
 </head>
 <body>
 
@@ -35,14 +35,21 @@
   </div>
 </main>
 
-<script src="js/store.js?v=9"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js?v=11"></script>
+<script src="js/firebase-init.js?v=11"></script>
+<script src="js/store.js?v=11"></script>
 <script>
-  document.getElementById('loginForm').addEventListener('submit', (e)=>{
+  document.getElementById('loginForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
     const id = document.getElementById('memberId').value.trim();
     const err = document.getElementById('loginError');
     if(!id){ err.style.display='block'; err.textContent='Enter your Member ID to continue.'; return; }
-    const m = Auth.loginMember(id);
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true; submitBtn.textContent = 'Checking…';
+    const m = await Auth.loginMember(id);
+    submitBtn.disabled = false; submitBtn.textContent = 'Log In';
     if(!m){
       err.style.display='block';
       err.textContent = "We couldn't find that Member ID. Check the code on your digital card and try again.";

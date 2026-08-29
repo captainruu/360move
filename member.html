@@ -7,7 +7,7 @@
 <link rel="icon" href="assets/favicon-32.png" sizes="32x32">
 <link rel="icon" href="assets/favicon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="assets/favicon-180.png">
-<link rel="stylesheet" href="css/style.css?v=9">
+<link rel="stylesheet" href="css/style.css?v=11">
 </head>
 <body>
 
@@ -50,24 +50,30 @@
   </div>
 </main>
 
-<script src="js/store.js?v=9"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js?v=11"></script>
+<script src="js/firebase-init.js?v=11"></script>
+<script src="js/store.js?v=11"></script>
 <script>
-  const memberId = Auth.currentMemberId();
-  if(!memberId){ location.href = 'login.html'; }
+  (async ()=>{
+    const memberId = Auth.currentMemberId();
+    if(!memberId){ location.href = 'login.html'; return; }
 
-  const member = DB.getMember(memberId);
-  if(!member){ Auth.logoutMember(); location.href = 'login.html'; }
+    const member = await DB.getMember(memberId);
+    if(!member){ Auth.logoutMember(); location.href = 'login.html'; return; }
 
-  DB.refreshStatus(member);
+    DB.refreshStatus(member);
 
-  document.getElementById('mName').textContent = member.name;
-  document.getElementById('mId').textContent = member.memberId;
-  document.getElementById('mPackage').textContent = member.membershipPackage;
-  document.getElementById('mExpiry').textContent = formatDate(member.expiryDate);
+    document.getElementById('mName').textContent = member.name;
+    document.getElementById('mId').textContent = member.memberId;
+    document.getElementById('mPackage').textContent = member.membershipPackage;
+    document.getElementById('mExpiry').textContent = formatDate(member.expiryDate);
 
-  const tag = document.getElementById('statusTag');
-  tag.textContent = member.status.toUpperCase();
-  tag.className = 'tag ' + (member.status === 'Active' ? 'tag-active' : 'tag-expired');
+    const tag = document.getElementById('statusTag');
+    tag.textContent = member.status.toUpperCase();
+    tag.className = 'tag ' + (member.status === 'Active' ? 'tag-active' : 'tag-expired');
+  })();
 
   document.getElementById('logoutBtn').addEventListener('click', ()=>{
     Auth.logoutMember();

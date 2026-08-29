@@ -16,8 +16,8 @@
    ========================================================================== */
 
 const SUPABASE_CONFIG = {
-  url: "YOUR_SUPABASE_PROJECT_URL",
-  anonKey: "YOUR_SUPABASE_ANON_KEY",
+  url: "https://ebvpkvuokcwfgqumctmy.supabase.co",
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidnBrdnVva2N3ZmdxdW1jdG15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MjQzNjAsImV4cCI6MjEwMzUwMDM2MH0.GEcHAHRvYDs_V3UtYeJzg04ye8OXHrolVY_rVo0nm_c",
   bucket: "promo-images"
 };
 

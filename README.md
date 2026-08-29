@@ -58,9 +58,25 @@ Two integrations are wired up and ready — they just need your project's keys:
    uploads fall back to local base64 storage so the flow keeps working in the demo.
 
 ### Members / check-ins / packages (Firestore)
-These still run on the local mock in `js/store.js` (see the comment at the top of
-that file for the swap points — `DB.*` functions map 1:1 to Firestore reads/writes
-you can drop in without touching `admin.js`, `member.html`, or `index.html`).
+These now run on real Firestore automatically once `js/firebase-config.js`
+has real values (same config used for Auth) — no extra code changes
+needed. Collections used:
+- `members` — doc ID is the Member ID itself (e.g. `members/360-AU6H7S`)
+- `checkins` — one auto-ID doc per visit
+- `promos_events` — one auto-ID doc per promo/event
+- `config/pricing` — `{ packageGroups: [...] }`
+- `config/discounts` — `{ discountTiers: [...] }`
+
+The first time an admin visits with Firebase configured, these collections
+are auto-seeded with the same demo content used in the local fallback, so
+there's something to explore immediately. Paste `firestore.rules` (in this
+folder) into **Firebase Console → Firestore Database → Rules** — it lets
+members look up their own ID (passwordless login) and the public site read
+promos/pricing, while all writes require the signed-in admin account.
+
+When Firebase ISN'T configured, everything transparently falls back to the
+original localStorage-only demo store — same function names, same
+behavior, just per-browser instead of shared.
 
 ## Data layer (important)
 

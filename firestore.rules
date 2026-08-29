@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Members: anyone who already KNOWS a specific Member ID can read that
+    // one record (this is how passwordless member login works — the ID
+    // itself acts like a lookup code). Listing/browsing the whole
+    // collection, and any create/update/delete, requires admin sign-in.
+    match /members/{memberId} {
+      allow get: if true;
+      allow list: if request.auth != null;
+      allow create, update, delete: if request.auth != null;
+    }
+
+    // Check-ins: admin-only in both directions (members never read or
+    // write these directly).
+    match /checkins/{checkinId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Promo/Event artwork: public can read (shown on the homepage),
+    // only signed-in admin can publish/remove.
+    match /promos_events/{promoId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Pricing + discount tier config: public can read (shown on the
+    // Membership section), only signed-in admin can edit.
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}

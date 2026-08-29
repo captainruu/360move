@@ -7,7 +7,7 @@ if(!Auth.isAdminLoggedIn()){
   location.href = 'admin-login.html';
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
+document.addEventListener('DOMContentLoaded', async ()=>{
   const creds = DB.adminCreds();
   document.getElementById('whoAmI').textContent = creds.email;
 
@@ -64,11 +64,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   /* ==========================================================
      OVERVIEW
      ========================================================== */
-  function renderOverview(){
+  async function renderOverview(){
     const monthVal = document.getElementById('ovMonth').value;
     const yearVal = document.getElementById('ovYear').value;
-    const members = DB.members().map(DB.refreshStatus);
-    const checkins = DB.checkins();
+    const members = (await DB.members()).map(DB.refreshStatus);
+    const checkins = await DB.checkins();
 
     const inPeriodMembers = members.filter(m=>matchesFilter(m.createdAt, monthVal, yearVal));
     const inPeriodCheckins = checkins.filter(c=>matchesFilter(c.date, monthVal, yearVal));
@@ -96,10 +96,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('ovDownload').addEventListener('click', ()=> exportMembersCsv('ov'));
   document.getElementById('ovExport').addEventListener('click', ()=> exportMembersCsv('ov'));
 
-  function exportMembersCsv(prefix){
+  async function exportMembersCsv(prefix){
     const monthVal = document.getElementById(prefix+'Month').value;
     const yearVal = document.getElementById(prefix+'Year').value;
-    const members = DB.members().map(DB.refreshStatus).filter(m=>matchesFilter(m.createdAt, monthVal, yearVal));
+    const members = (await DB.members()).map(DB.refreshStatus).filter(m=>matchesFilter(m.createdAt, monthVal, yearVal));
     const rows = [['Member ID','Name','Phone','Package','Status','Expiry Date','Joined']];
     members.forEach(m=> rows.push([m.memberId, m.name, m.phone, m.membershipPackage, m.status, m.expiryDate, m.createdAt]));
     csvDownload(`members_${periodLabel(monthVal, yearVal)}.csv`, rows);
@@ -109,11 +109,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
   /* ==========================================================
      MEMBERS
      ========================================================== */
-  fillMonthYear; // (already filled above)
-  function renderMembers(){
+  async function renderMembers(){
     const monthVal = document.getElementById('memMonth').value;
     const yearVal = document.getElementById('memYear').value;
-    const all = DB.members().map(DB.refreshStatus);
+    const all = (await DB.members()).map(DB.refreshStatus);
     const list = (monthVal==='all' && yearVal==='all') ? all : all.filter(m=>matchesFilter(m.createdAt, monthVal, yearVal));
 
     const body = document.getElementById('membersBody');
@@ -146,40 +145,38 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('memDownload').addEventListener('click', ()=> exportMembersCsv('mem'));
   document.getElementById('memExport').addEventListener('click', ()=> exportMembersCsv('mem'));
 
-  function deleteMember(memberId){
+  async function deleteMember(memberId){
     if(!confirm(`Delete member ${memberId}? This cannot be undone.`)) return;
-    DB.deleteMember(memberId);
+    await DB.deleteMember(memberId);
     renderMembers();
     renderOverview();
     toast('Member deleted');
   }
 
   // ---- Add Member modal ----
-  function fillPackageSelect(){
+  async function fillPackageSelect(){
     const packageSelect = document.getElementById('nmPackage');
     packageSelect.innerHTML = '';
-    DB.flatTiers().forEach(t=>{
+    (await DB.flatTiers()).forEach(t=>{
       const opt = document.createElement('option');
       opt.value = t.label; opt.textContent = `${t.label} — ${formatIDR(t.price)}`;
       packageSelect.appendChild(opt);
     });
   }
-  function fillDiscountSelect(){
+  async function fillDiscountSelect(){
     const sel = document.getElementById('nmDiscount');
     sel.innerHTML = '<option value="0">No discount</option>';
-    DB.discountTiers().forEach(t=>{
+    (await DB.discountTiers()).forEach(t=>{
       if(t.percent<=0) return;
       const opt = document.createElement('option');
       opt.value = t.tier; opt.textContent = `${t.label} — ${t.percent}% off`;
       sel.appendChild(opt);
     });
   }
-  fillPackageSelect();
-  fillDiscountSelect();
 
   openModal('addMemberBtn', 'modalAddMember');
 
-  document.getElementById('addMemberForm').addEventListener('submit', (e)=>{
+  document.getElementById('addMemberForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
     const name = document.getElementById('nmName').value.trim();
     const phone = document.getElementById('nmPhone').value.trim();
@@ -188,7 +185,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const discountTier = document.getElementById('nmDiscount').value;
     if(!name || !phone) return;
 
-    const member = DB.addMember({ name, phone, membershipPackage, durationDays, discountTier });
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true; submitBtn.textContent = 'Registering…';
+
+    const member = await DB.addMember({ name, phone, membershipPackage, durationDays, discountTier });
+
+    submitBtn.disabled = false; submitBtn.textContent = 'Register & Generate Member ID';
     closeModal('modalAddMember');
     document.getElementById('addMemberForm').reset();
     document.getElementById('nmDuration').value = 30;
@@ -209,8 +211,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
   /* ==========================================================
      DIGITAL CARD
      ========================================================== */
-  function openCardModal(memberId){
-    const m = DB.refreshStatus(DB.getMember(memberId));
+  async function openCardModal(memberId){
+    const m = DB.refreshStatus(await DB.getMember(memberId));
     if(!m) return;
 
     document.getElementById('dcardId').textContent = m.memberId;
@@ -267,8 +269,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
   /* ==========================================================
      MEMBER DETAILS & HISTORY
      ========================================================== */
-  function openDetailsModal(memberId){
-    const m = DB.refreshStatus(DB.getMember(memberId));
+  async function openDetailsModal(memberId){
+    const m = DB.refreshStatus(await DB.getMember(memberId));
     if(!m) return;
     const grid = document.getElementById('detailGrid');
     grid.innerHTML = `
@@ -279,7 +281,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       <div class="d"><label>Status</label><div>${m.status}</div></div>
       <div class="d"><label>Expiry</label><div>${formatDate(m.expiryDate)}</div></div>
     `;
-    const history = DB.checkinsForMember(memberId);
+    const history = await DB.checkinsForMember(memberId);
     const body = document.getElementById('historyBody');
     body.innerHTML = '';
     if(history.length===0){
@@ -297,9 +299,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
   /* ==========================================================
      CHECK-IN
      ========================================================== */
-  function showVerification(memberId){
+  async function showVerification(memberId){
     const card = document.getElementById('verifyCard');
-    const m = DB.refreshStatus(DB.getMember(memberId));
+    card.innerHTML = `<div class="verify-placeholder">Looking up "${memberId}"…</div>`;
+    const m = DB.refreshStatus(await DB.getMember(memberId));
     if(!m){
       card.innerHTML = `<div class="verify-placeholder">No member found for ID "${memberId}". Double-check the code and try again.</div>`;
       return;
@@ -315,8 +318,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
         <button class="btn btn-gold btn-block" id="doCheckinBtn" style="margin-top:24px;">CHECK IN</button>
       </div>
     `;
-    document.getElementById('doCheckinBtn').addEventListener('click', ()=>{
-      DB.addCheckin(m);
+    document.getElementById('doCheckinBtn').addEventListener('click', async ()=>{
+      await DB.addCheckin(m);
       toast(`${m.name} checked in`);
       renderDailyLog();
       renderOverview();
@@ -332,9 +335,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
     showVerification(id);
   });
 
-  function renderDailyLog(){
+  async function renderDailyLog(){
     const body = document.getElementById('dailyLogBody');
-    const rows = DB.todaysCheckins();
+    const rows = await DB.todaysCheckins();
     body.innerHTML = '';
     if(rows.length===0){
       body.innerHTML = `<tr class="empty-row"><td colspan="4">No check-ins yet today.</td></tr>`;
@@ -482,7 +485,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
     try{
       const imgUrl = await PromoStorage.upload(selectedPromoFile);
-      DB.addPromo({ title, desc, img: imgUrl });
+      await DB.addPromo({ title, desc, img: imgUrl });
       e.target.reset();
       selectedPromoFile = null;
       document.getElementById('uploadPreviewImg').style.display = 'none';
@@ -495,9 +498,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
     submitBtn.disabled = false; submitBtn.textContent = 'Publish to Website';
   });
 
-  function renderPromoAdmin(){
+  async function renderPromoAdmin(){
     const grid = document.getElementById('promoAdminGrid');
-    const promos = DB.promos();
+    const promos = await DB.promos();
     grid.innerHTML = '';
     if(promos.length===0){
       grid.innerHTML = `<div class="promo-empty" style="grid-column:1/-1;">Nothing published yet.</div>`;
@@ -510,8 +513,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
       grid.appendChild(div);
     });
     grid.querySelectorAll('[data-del]').forEach(b=>{
-      b.addEventListener('click', ()=>{
-        DB.deletePromo(b.dataset.del);
+      b.addEventListener('click', async ()=>{
+        await DB.deletePromo(b.dataset.del);
         renderPromoAdmin();
         toast('Promo removed');
       });
@@ -521,10 +524,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
   /* ==========================================================
      PRICING & DISCOUNTS
      ========================================================== */
-  function renderPricing(){
+  async function renderPricing(){
     const wrap = document.getElementById('pricingGroups');
     wrap.innerHTML = '';
-    const groups = DB.packageGroups();
+    const groups = await DB.packageGroups();
 
     groups.forEach((g, gi)=>{
       const box = document.createElement('div');
@@ -560,7 +563,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       });
     });
     wrap.querySelectorAll('[data-save-group]').forEach(b=>{
-      b.addEventListener('click', ()=>{
+      b.addEventListener('click', async ()=>{
         const gi = Number(b.dataset.saveGroup);
         const box = b.closest('.card-box');
         box.querySelectorAll('[data-field]').forEach(inp=>{
@@ -574,7 +577,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
           const ti = Number(inp.dataset.tierPrice);
           groups[gi].tiers[ti].price = Number(inp.value) || 0;
         });
-        DB.updatePackageGroups(groups);
+        b.disabled = true; const oldText = b.textContent; b.textContent = 'Saving…';
+        await DB.updatePackageGroups(groups);
+        b.disabled = false; b.textContent = oldText;
         fillPackageSelect();
         toast(`${groups[gi].category} pricing saved`);
       });
@@ -602,9 +607,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   }
 
-  function renderDiscountTiers(){
+  async function renderDiscountTiers(){
     const body = document.getElementById('discountBody');
-    const tiers = DB.discountTiers();
+    const tiers = await DB.discountTiers();
     body.innerHTML = '';
     tiers.forEach((t, i)=>{
       const tr = document.createElement('tr');
@@ -615,19 +620,22 @@ document.addEventListener('DOMContentLoaded', ()=>{
       `;
       body.appendChild(tr);
     });
+
+    document.getElementById('saveDiscountsBtn').onclick = async ()=>{
+      document.querySelectorAll('[data-dt-label]').forEach(inp=>{
+        tiers[Number(inp.dataset.dtLabel)].label = inp.value.trim();
+      });
+      document.querySelectorAll('[data-dt-percent]').forEach(inp=>{
+        tiers[Number(inp.dataset.dtPercent)].percent = Math.max(0, Math.min(100, Number(inp.value)||0));
+      });
+      const btn = document.getElementById('saveDiscountsBtn');
+      btn.disabled = true; const oldText = btn.textContent; btn.textContent = 'Saving…';
+      await DB.updateDiscountTiers(tiers);
+      btn.disabled = false; btn.textContent = oldText;
+      fillDiscountSelect();
+      toast('Discount tiers saved');
+    };
   }
-  document.getElementById('saveDiscountsBtn').addEventListener('click', ()=>{
-    const tiers = DB.discountTiers();
-    document.querySelectorAll('[data-dt-label]').forEach(inp=>{
-      tiers[Number(inp.dataset.dtLabel)].label = inp.value.trim();
-    });
-    document.querySelectorAll('[data-dt-percent]').forEach(inp=>{
-      tiers[Number(inp.dataset.dtPercent)].percent = Math.max(0, Math.min(100, Number(inp.value)||0));
-    });
-    DB.updateDiscountTiers(tiers);
-    fillDiscountSelect();
-    toast('Discount tiers saved');
-  });
 
   /* ==========================================================
      MODAL helpers
@@ -643,10 +651,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
   });
 
   // ---- initial render ----
-  renderOverview();
-  renderMembers();
-  renderDailyLog();
-  renderPromoAdmin();
-  renderPricing();
-  renderDiscountTiers();
+  await Promise.all([
+    renderOverview(),
+    renderMembers(),
+    renderDailyLog(),
+    renderPromoAdmin(),
+    renderPricing(),
+    renderDiscountTiers(),
+    fillPackageSelect(),
+    fillDiscountSelect()
+  ]);
 });

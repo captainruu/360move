@@ -7,22 +7,12 @@
    login in js/store.js (Auth.loginAdmin) so the dashboard stays usable
    while you wire up your Firebase project.
 
-   Requires (loaded before this file, only matters once configured):
+   Requires (loaded before this file):
      <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
      <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+     js/firebase-config.js
+     js/firebase-init.js   (provides getFirebaseApp())
    ========================================================================== */
-
-let _fbApp = null;
-function getFirebaseApp(){
-  if(!isFirebaseConfigured()) return null;
-  if(_fbApp) return _fbApp;
-  if(typeof firebase === 'undefined'){
-    console.warn('Firebase SDK not loaded — check the <script> tags in this page.');
-    return null;
-  }
-  _fbApp = firebase.initializeApp(FIREBASE_CONFIG);
-  return _fbApp;
-}
 
 const FirebaseAdminAuth = {
   isLive(){ return isFirebaseConfigured() && typeof firebase !== 'undefined'; },

@@ -11,12 +11,13 @@
    ========================================================================== */
 
 const FIREBASE_CONFIG = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyA8IkFiXmcm0p-SkOYRxSmKW3BOn6bfyHA",
+  authDomain: "move-76021.firebaseapp.com",
+  projectId: "move-76021",
+  storageBucket: "move-76021.firebasestorage.app",
+  messagingSenderId: "481856099663",
+  appId: "1:481856099663:web:b1ec947909cc21fa31a13a",
+  measurementId: "G-J5QG28RMBX"
 };
 
 function isFirebaseConfigured(){

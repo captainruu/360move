@@ -7,7 +7,7 @@
 <link rel="icon" href="assets/favicon-32.png" sizes="32x32">
 <link rel="icon" href="assets/favicon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="assets/favicon-180.png">
-<link rel="stylesheet" href="css/style.css?v=9">
+<link rel="stylesheet" href="css/style.css?v=11">
 </head>
 <body>
 
@@ -87,35 +87,41 @@
   </section>
 </main>
 
-<script src="js/store.js?v=9"></script>
-<script src="js/main.js?v=9"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js?v=11"></script>
+<script src="js/firebase-init.js?v=11"></script>
+<script src="js/store.js?v=11"></script>
+<script src="js/main.js?v=11"></script>
 <script>
   const params = new URLSearchParams(location.search);
   let selectedPlan = null;
-  const groups = DB.packageGroups();
   const preselectGroup = params.get('group');
-
   const pickGroups = document.getElementById('pickGroups');
-  groups.forEach(g=>{
-    const wrap = document.createElement('div');
-    wrap.style.marginBottom = '40px';
-    wrap.innerHTML = `<div class="eyebrow" style="justify-content:center;margin-bottom:16px;">${g.category} — ${g.subtitle}</div>`;
-    const grid = document.createElement('div');
-    grid.className = 'package-pick';
-    wrap.appendChild(grid);
-    pickGroups.appendChild(wrap);
 
-    g.tiers.forEach(t=>{
-      const card = document.createElement('button');
-      card.type = 'button';
-      card.className = 'pick-card';
-      card.innerHTML = `<div class="name">${t.name}</div><div class="price">${formatIDR(t.price)}</div><div style="font-size:12.5px;color:var(--grey-400);margin-top:10px;">${g.category}</div>`;
-      const plan = { name: `${g.category} — ${t.name}`, price: t.price };
-      card.addEventListener('click', ()=> choosePlan(plan, card));
-      grid.appendChild(card);
-      if(preselectGroup === g.id && g.tiers[0].id === t.id){ choosePlan(plan, card); }
+  (async ()=>{
+    const groups = await DB.packageGroups();
+    groups.forEach(g=>{
+      const wrap = document.createElement('div');
+      wrap.style.marginBottom = '40px';
+      wrap.innerHTML = `<div class="eyebrow" style="justify-content:center;margin-bottom:16px;">${g.category} — ${g.subtitle}</div>`;
+      const grid = document.createElement('div');
+      grid.className = 'package-pick';
+      wrap.appendChild(grid);
+      pickGroups.appendChild(wrap);
+
+      g.tiers.forEach(t=>{
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'pick-card';
+        card.innerHTML = `<div class="name">${t.name}</div><div class="price">${formatIDR(t.price)}</div><div style="font-size:12.5px;color:var(--grey-400);margin-top:10px;">${g.category}</div>`;
+        const plan = { name: `${g.category} — ${t.name}`, price: t.price };
+        card.addEventListener('click', ()=> choosePlan(plan, card));
+        grid.appendChild(card);
+        if(preselectGroup === g.id && g.tiers[0].id === t.id){ choosePlan(plan, card); }
+      });
     });
-  });
+  })();
 
   function setStep(n){
     document.querySelectorAll('.step').forEach(s=>{
