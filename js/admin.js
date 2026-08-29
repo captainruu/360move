@@ -367,15 +367,16 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   scanToggle.addEventListener('click', async ()=>{
     if(scanning){ stopScan(); return; }
     try{
-      // Ask for a moderate resolution — high-res camera streams make every
-      // frame expensive to scan on phones, which was causing scans to feel
-      // like they "never" detect a code. 720p is plenty for a QR a few
-      // inches from the lens and scans noticeably faster on mobile.
+      // Ask for the camera's higher resolution — since we now only analyze
+      // the small cropped region inside the reticle (see scanLoop below)
+      // rather than a downscaled full frame, more native detail here
+      // directly means more pixels-per-QR-module where it actually
+      // matters, without the processing cost of scanning the whole frame.
       scanStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: 'environment' },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
         }
       });
       video.srcObject = scanStream;
@@ -435,17 +436,31 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   // mobile Chrome/Safari.
   const canvasEl = document.createElement('canvas');
   const canvasCtx = canvasEl.getContext('2d', { willReadFrequently: true });
-  const SCAN_MAX_DIM = 700; // downscale each frame before decoding — faster, and still plenty of detail for a QR filling most of the frame
+  // Only analyze the region inside the yellow reticle guide (see
+  // .scan-reticle inset:14% in css/style.css) instead of the whole,
+  // downscaled frame. Cropping to where the user is actually holding the
+  // code gives jsQR far more effective pixels-per-module to work with,
+  // which matters more for detection than raw frame resolution — this
+  // fixed scans that stayed undetected even once the camera was in focus.
+  const RETICLE_INSET = 0.14;
+  const SCAN_MAX_DIM = 900; // cap on the cropped region, not the full frame
 
   function scanLoop(){
     if(!scanning) return;
     if(video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth){
-      const scale = Math.min(1, SCAN_MAX_DIM / Math.max(video.videoWidth, video.videoHeight));
-      const w = Math.round(video.videoWidth * scale);
-      const h = Math.round(video.videoHeight * scale);
-      canvasEl.width = w; canvasEl.height = h;
-      canvasCtx.drawImage(video, 0, 0, w, h);
-      const imgData = canvasCtx.getImageData(0, 0, w, h);
+      const vw = video.videoWidth, vh = video.videoHeight;
+      // scan-box is a square (aspect-ratio:1/1), so map the reticle's
+      // percentage inset onto the shorter video dimension, centered.
+      const shortSide = Math.min(vw, vh);
+      const cropSize = Math.round(shortSide * (1 - RETICLE_INSET * 2));
+      const sx = Math.round((vw - cropSize) / 2);
+      const sy = Math.round((vh - cropSize) / 2);
+
+      const scale = Math.min(1, SCAN_MAX_DIM / cropSize);
+      const outSize = Math.round(cropSize * scale);
+      canvasEl.width = outSize; canvasEl.height = outSize;
+      canvasCtx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, outSize, outSize);
+      const imgData = canvasCtx.getImageData(0, 0, outSize, outSize);
       const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
       if(code && code.data){
         const id = code.data.trim().toUpperCase();
