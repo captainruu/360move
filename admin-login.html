@@ -3,77 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Login — 360 MOVE Uluwatu</title>
-<link rel="icon" href="assets/favicon-32.png" sizes="32x32">
-<link rel="icon" href="assets/favicon-192.png" sizes="192x192">
-<link rel="apple-touch-icon" href="assets/favicon-180.png">
-<link rel="stylesheet" href="css/style.css?v=17">
+<title>Admin Login – Dash Gym Bali</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/images/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/member.css">
 </head>
 <body>
 
-<a href="index.html" class="back-home">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-  Back to site
-</a>
-
-<main class="auth-shell">
-  <div class="auth-card">
-    <div class="auth-logo"><img src="assets/logo.png" alt="360 MOVE logo"></div>
-    <h1>Admin Login</h1>
-    <p class="sub">Sign in to manage members, check-ins &amp; promos.</p>
-
-    <form id="adminForm">
-      <div class="field">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="admin@360move.com" autocomplete="username">
-      </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
-      </div>
-      <div class="field-error" id="loginError">Incorrect email or password.</div>
-      <button type="submit" class="btn btn-gold btn-block">Log In</button>
-    </form>
-
-    <p class="auth-foot" id="authModeNote">Demo credentials: <strong style="color:var(--grey-200);">admin@360move.com</strong> / <strong style="color:var(--grey-200);">360move2026</strong></p>
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="assets/images/logo-gold.png" alt="DASH" onerror="this.style.display='none'">
+      <div style="font-family:var(--font-head);font-size:22px;letter-spacing:2px;margin-top:.5rem;">DASH GYM BALI</div>
+    </div>
+    <h2 class="login-title" data-en="Staff / Admin Login" data-id="Login Staff / Admin">Staff / Admin Login</h2>
+    <p class="login-sub" data-en="Sign in with your admin email and password." data-id="Masuk dengan email dan kata sandi admin Anda.">Sign in with your admin email and password.</p>
+    <div class="form-group" style="text-align:left;">
+      <label data-en="Admin Email" data-id="Email Admin">Admin Email</label>
+      <input type="email" id="adminEmail" placeholder="admin@dashgymbali.com" autocomplete="username">
+    </div>
+    <div class="form-group" style="text-align:left;">
+      <label data-en="Password" data-id="Kata Sandi">Password</label>
+      <input type="password" id="adminPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:.85rem;" onclick="doAdminLogin()" data-en="Login as Admin" data-id="Masuk sebagai Admin">Login as Admin</button>
+    <div style="margin-top:1.5rem;">
+      <a href="login.html" class="btn btn-outline" style="width:100%;justify-content:center;" data-en="← Member Login" data-id="← Login Member">← Member Login</a>
+    </div>
   </div>
-</main>
+</div>
 
-<!--
-  Admin login uses Firebase Authentication when js/firebase-config.js has real
-  project values (see that file for where to get them). Until then, it falls
-  back to the local demo login automatically — see js/firebase-auth.js.
--->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="js/firebase-config.js?v=17"></script>
-<script src="js/firebase-init.js?v=17"></script>
-<script src="js/store.js?v=17"></script>
-<script src="js/firebase-auth.js?v=17"></script>
-<script>
-  if(FirebaseAdminAuth.isLive()){
-    document.getElementById('authModeNote').textContent = 'Secure sign-in enabled.';
-  }
+<div id="toast" class="toast"></div>
 
-  document.getElementById('adminForm').addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const err = document.getElementById('loginError');
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.disabled = true; btn.textContent = 'Signing in…';
-
-    const result = await FirebaseAdminAuth.login(email, password);
-
-    if(result.ok){
-      location.href = 'admin.html';
-    }else{
-      err.textContent = result.error || 'Incorrect email or password.';
-      err.style.display = 'block';
-      btn.disabled = false; btn.textContent = 'Log In';
-    }
-  });
+<script type="module">
+  import { setLang, initModalOverlayClose } from './js/utils.js';
+  import { doAdminLogin } from './js/auth.js';
+  window.doAdminLogin = doAdminLogin;
+  window.setLang = setLang;
+  initModalOverlayClose();
 </script>
 </body>
 </html>

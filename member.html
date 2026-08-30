@@ -3,82 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Membership — 360 MOVE Uluwatu</title>
-<link rel="icon" href="assets/favicon-32.png" sizes="32x32">
-<link rel="icon" href="assets/favicon-192.png" sizes="192x192">
-<link rel="apple-touch-icon" href="assets/favicon-180.png">
-<link rel="stylesheet" href="css/style.css?v=17">
+<title>My Account – Dash Gym Bali</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/images/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/member.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
-<a href="index.html" class="back-home">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-  Back to site
-</a>
-
-<main class="mcard">
-  <div class="eyebrow" style="justify-content:center;margin-bottom:16px;">My Membership</div>
-  <div class="mcard-visual">
-    <div class="mcard-head">
-      <img src="assets/logo.png" alt="360 MOVE logo">
-      <span>360 MOVE</span>
+<div id="member-page">
+  <nav style="position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,10,0.95);border-bottom:1px solid var(--border);">
+    <span style="font-family:var(--font-head);font-size:20px;letter-spacing:2px;">DASH GYM BALI</span>
+    <div style="display:flex;gap:1rem;align-items:center;">
+      <span id="memberNavName" style="font-family:var(--font-cond);font-size:13px;letter-spacing:1px;color:var(--gray);text-transform:uppercase;"></span>
+      <button class="btn btn-outline btn-sm" onclick="doLogout()" data-en="Log Out" data-id="Keluar">Log Out</button>
     </div>
-    <div class="mcard-body">
-      <span class="tag" id="statusTag"></span>
-
-      <div class="mcard-row gold">
-        <label>Member Name</label>
-        <div id="mName">—</div>
+  </nav>
+  <div class="dash-header">
+    <div class="container">
+      <p class="section-tag" data-en="Member Dashboard" data-id="Dashboard Member">Member Dashboard</p>
+      <h2 class="dash-title" data-en="My Account" data-id="Akun Saya">My Account</h2>
+    </div>
+  </div>
+  <div class="container" style="padding-top:2rem;padding-bottom:4rem;">
+    <div class="member-idcard">
+      <div class="micard-header">
+        <img class="micard-logo" id="micardLogo" src="" alt="DASH GYM BALI">
       </div>
-      <div class="mcard-row">
-        <label>Member ID</label>
-        <div id="mId" style="font-family:var(--font-mono);"></div>
+      <div class="micard-body">
+        <div class="micard-status-pill" id="mStatusPill"><span id="mStatusText"></span></div>
+        <div class="micard-label" data-en="Member ID" data-id="ID Member">Member ID</div>
+        <div class="micard-id" id="mId"></div>
+        <div class="micard-name" id="mName"></div>
+        <div class="micard-phone" id="mPhone"></div>
+        <div class="micard-expiry-label" data-en="Expiry Date" data-id="Tanggal Berakhir">Expiry Date</div>
+        <div class="micard-expiry" id="mExpiry"></div>
+        <button class="micard-checkin-btn" id="mCheckInBtn" onclick="selfCheckIn()" data-en="Check In" data-id="Check In">Check In</button>
       </div>
-      <div class="mcard-row">
-        <label>Membership Package</label>
-        <div id="mPackage">—</div>
+    </div>
+    <div class="member-card">
+      <div class="member-meta">
+        <div class="meta-item"><div class="meta-label" data-en="Package" data-id="Paket">Package</div><div class="meta-val" id="mPkg"></div></div>
+        <div class="meta-item"><div class="meta-label" data-en="Start Date" data-id="Tanggal Mulai">Start Date</div><div class="meta-val" id="mStart"></div></div>
+        <div class="meta-item"><div class="meta-label" data-en="Days Remaining" data-id="Sisa Hari">Days Remaining</div><div class="meta-val" id="mDays"></div></div>
       </div>
-      <div class="mcard-row">
-        <label>Expiry Date</label>
-        <div id="mExpiry">—</div>
-      </div>
-
-      <div class="mcard-actions">
-        <button class="btn btn-line btn-block" id="logoutBtn">Log Out</button>
+      <div class="barcode-section">
+        <h3 data-en="Your Member QR Code" data-id="QR Code Member Anda">Your Member QR Code</h3>
+        <div id="qr-container"></div>
+        <p style="font-family:var(--font-cond);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-top:1rem;" id="mCodeDisplay"></p>
       </div>
     </div>
   </div>
-</main>
+</div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="js/firebase-config.js?v=17"></script>
-<script src="js/firebase-init.js?v=17"></script>
-<script src="js/store.js?v=17"></script>
-<script>
-  (async ()=>{
-    const memberId = Auth.currentMemberId();
-    if(!memberId){ location.href = 'login.html'; return; }
+<div id="toast" class="toast"></div>
 
-    const member = await DB.getMember(memberId);
-    if(!member){ Auth.logoutMember(); location.href = 'login.html'; return; }
+<script type="module">
+  import { setLang, initModalOverlayClose } from './js/utils.js';
+  import { doLogout } from './js/auth.js';
+  import { initMemberPage } from './js/member-dashboard.js';
 
-    DB.refreshStatus(member);
-
-    document.getElementById('mName').textContent = member.name;
-    document.getElementById('mId').textContent = member.memberId;
-    document.getElementById('mPackage').textContent = member.membershipPackage;
-    document.getElementById('mExpiry').textContent = formatDate(member.expiryDate);
-
-    const tag = document.getElementById('statusTag');
-    tag.textContent = member.status.toUpperCase();
-    tag.className = 'tag ' + (member.status === 'Active' ? 'tag-active' : 'tag-expired');
-  })();
-
-  document.getElementById('logoutBtn').addEventListener('click', ()=>{
-    Auth.logoutMember();
-    location.href = 'index.html';
-  });
+  window.doLogout = doLogout;
+  window.setLang = setLang;
+  initModalOverlayClose();
+  initMemberPage();
 </script>
 </body>
 </html>
