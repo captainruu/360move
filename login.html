@@ -3,47 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Member Login – Dash Gym Bali</title>
-<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/images/favicon-180.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/member.css">
+<title>Member Login — 360 MOVE Uluwatu</title>
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32">
+<link rel="icon" href="assets/favicon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/favicon-180.png">
+<link rel="stylesheet" href="css/style.css?v=17">
 </head>
 <body>
 
-<div id="login-page">
-  <div class="login-box">
-    <div class="login-logo">
-      <img src="assets/images/logo-gold.png" alt="DASH" onerror="this.style.display='none'">
-      <div style="font-family:var(--font-head);font-size:22px;letter-spacing:2px;margin-top:.5rem;">DASH GYM BALI</div>
-    </div>
-    <h2 class="login-title" data-en="Welcome Back" data-id="Selamat Datang">Welcome Back</h2>
-    <p class="login-sub" data-en="Enter your unique member code to access your account." data-id="Masukkan kode unik member Anda untuk mengakses akun.">Enter your unique member code to access your account.</p>
-    <div class="form-group">
-      <label data-en="Member Code" data-id="Kode Member">Member Code</label>
-      <input type="text" id="loginCode" placeholder="e.g. DASH-2025-XXXXX" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:.85rem;" onclick="doLogin()" data-en="Login" data-id="Masuk">Login</button>
-    <div style="margin-top:1.5rem;">
-      <a href="index.html" class="btn btn-outline" style="width:100%;justify-content:center;" data-en="← Back to Website" data-id="← Kembali ke Website">← Back to Website</a>
-    </div>
-    <p style="margin-top:1.5rem;font-size:12px;letter-spacing:1px;">
-      <a href="admin-login.html" style="color:var(--gray);text-decoration:underline;" data-en="Staff / Admin Login" data-id="Login Staff / Admin">Staff / Admin Login</a>
-    </p>
+<a href="index.html" class="back-home">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  Back to site
+</a>
+
+<main class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-logo"><img src="assets/logo.png" alt="360 MOVE logo"></div>
+    <h1>Member Login</h1>
+    <p class="sub">Enter your Member ID — no password needed.</p>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="memberId">Member ID</label>
+        <input type="text" id="memberId" class="mono-input" placeholder="e.g. 360-MV0001" autocomplete="off">
+      </div>
+      <div class="field-error" id="loginError">We couldn't find that Member ID. Check the code on your digital card and try again.</div>
+      <button type="submit" class="btn btn-gold btn-block">Log In</button>
+    </form>
+
+    <p class="auth-foot">Not a member yet? <a href="join.html">Join us</a> · Try the demo ID <strong style="color:var(--grey-200);">360-DEMO99</strong></p>
   </div>
-</div>
+</main>
 
-<div id="toast" class="toast"></div>
-
-<script type="module">
-  import { setLang, initModalOverlayClose } from './js/utils.js';
-  import { doLogin } from './js/auth.js';
-  window.doLogin = doLogin;
-  window.setLang = setLang;
-  initModalOverlayClose();
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js?v=17"></script>
+<script src="js/firebase-init.js?v=17"></script>
+<script src="js/store.js?v=17"></script>
+<script>
+  document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const id = document.getElementById('memberId').value.trim();
+    const err = document.getElementById('loginError');
+    if(!id){ err.style.display='block'; err.textContent='Enter your Member ID to continue.'; return; }
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true; submitBtn.textContent = 'Checking…';
+    const m = await Auth.loginMember(id);
+    submitBtn.disabled = false; submitBtn.textContent = 'Log In';
+    if(!m){
+      err.style.display='block';
+      err.textContent = "We couldn't find that Member ID. Check the code on your digital card and try again.";
+      return;
+    }
+    location.href = 'member.html';
+  });
 </script>
 </body>
 </html>

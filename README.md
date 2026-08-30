@@ -1,76 +1,124 @@
-# Dash Gym Bali — Website
+# 360 MOVE Uluwatu — Web App
 
-Struktur multi-halaman (bukan lagi 1 file HTML raksasa) untuk website DASH Gym Bali. Backend: **Firebase Firestore + Auth** (data member, packages, promo, check-in, login admin) dan **Supabase Storage** (upload gambar promo).
+A responsive front-end build of the 360 MOVE Uluwatu gym web app, built directly
+from `prd.md` and the brand assets provided (logo, storefront, class photos,
+digital card & check-in popup references).
 
-## Struktur Folder
+## How to open it
 
-```
-├── index.html          → Halaman utama publik (hero, about, facilities, packages, dll)
-├── login.html           → Login member (pakai kode member)
-├── admin-login.html     → Login admin (email + password, Firebase Auth)
-├── member.html           → Dashboard member (perlu login member)
-├── admin.html             → Dashboard admin (perlu login admin)
-├── css/
-│   ├── base.css          → Variabel warna, reset, tombol, modal, toast (dipakai semua halaman)
-│   ├── public.css        → Styling khusus index.html
-│   ├── member.css        → Styling khusus login.html, admin-login.html, member.html
-│   └── admin.css         → Styling khusus admin.html
-├── js/
-│   ├── config.js          → Konfigurasi Firebase & Supabase + data paket default
-│   ├── utils.js            → Fungsi bantu umum (toast, loading, bahasa, modal, sesi member)
-│   ├── db-members.js       → Query Firestore untuk data member
-│   ├── db-checkins.js      → Query Firestore untuk data check-in
-│   ├── db-packages.js      → Query Firestore untuk data paket harga
-│   ├── db-promos.js        → Query Firestore untuk data promo
-│   ├── auth.js              → Login member, login admin, logout, page guard
-│   ├── card-generator.js    → Generate kartu member digital (canvas + QR)
-│   ├── public-site.js       → Logic khusus index.html (hero slider, packages, promo, chatbot)
-│   ├── member-dashboard.js  → Logic khusus member.html
-│   ├── admin-core.js        → Navigasi tab & overview admin.html
-│   ├── admin-members.js     → CRUD member, diskon, export CSV
-│   ├── admin-pricing.js     → Edit harga paket
-│   ├── admin-promo.js       → Upload/hapus artwork promo (Supabase Storage)
-│   └── admin-checkin.js     → Scanner QR check-in + lookup member
-└── assets/images/          → Semua gambar (logo, favicon, foto hero, foto about)
-```
+No build step — it's static HTML/CSS/JS.
 
-## Cara Menjalankan
+- **Quickest:** double-click `index.html` to open in a browser (member login,
+  join flow and the visual design all work; camera QR scan needs a real server,
+  see below).
+- **Recommended:** serve the folder so the camera scanner and all pages work
+  the same way they will in production:
+  ```bash
+  cd 360move
+  python3 -m http.server 8000
+  # then open http://localhost:8000
+  ```
 
-**Penting:** karena sekarang multi-halaman dan pakai ES Modules, file ini **tidak bisa** dibuka langsung dengan double-click (`file://`). Browser akan memblokir `import`/`export` dan kamera untuk QR scanner.
+## Pages
 
-Jalankan lewat local web server, contoh:
+| Page | Purpose |
+|---|---|
+| `index.html` | Public site — Hero, About, Our Service, Membership, Promo, Contact |
+| `join.html` | Join Us flow — pick package → name + phone → handoff to reception |
+| `login.html` | Member login (Member ID only, no password) |
+| `member.html` | Member account/portal (details + Log Out) |
+| `admin-login.html` | Admin login |
+| `admin.html` | Admin dashboard — Overview / Members / Check-in / Promo & Event |
 
-```bash
-# Python
-python3 -m http.server 8000
+## Demo logins
 
-# atau Node.js (perlu npm install -g http-server dulu)
-http-server -p 8000
-```
+- **Member:** Member ID `360-DEMO99` (or any seeded ID, e.g. `360-MV0001`) on `login.html`.
+- **Admin:** `admin@360move.com` / `360move2026` on `admin-login.html` (used automatically until Firebase is configured — see below).
 
-Lalu buka `http://localhost:8000` di browser.
+## Connecting your own backend (Firebase + Supabase)
 
-Untuk **live/production**, upload semua file & folder ini ke hosting statis (GitHub Pages, Netlify, Vercel, dll) — otomatis dapat HTTPS, jadi kamera QR scanner juga akan berfungsi.
+Two integrations are wired up and ready — they just need your project's keys:
 
-## Kredensial Backend
+### Admin login → Firebase Authentication
+1. Open `js/firebase-config.js` and fill in `FIREBASE_CONFIG` with the values from
+   **Firebase Console → Project settings → General → Your apps → SDK setup and configuration**.
+2. In the Firebase Console, enable **Authentication → Sign-in method → Email/Password**, then add your admin user(s) under **Users**.
+3. That's it — `admin-login.html` and `admin.html` already load the Firebase SDK and
+   `js/firebase-auth.js`. As soon as `apiKey` is a real value, admin login switches
+   from the local demo credentials to real Firebase sign-in automatically (see
+   `FirebaseAdminAuth.isLive()` in `js/firebase-auth.js`).
 
-Firebase project: `dash-gym-database`
-Supabase Storage bucket: `promos`
+### Promo & Event artwork → Supabase Storage
+1. In Supabase Dashboard, create a **public bucket** named `promo-images` (Storage → New bucket).
+2. Open `js/supabase-config.js` and fill in `SUPABASE_CONFIG.url` and `.anonKey`
+   from **Project Settings → API**.
+3. `admin.html` already loads the Supabase JS SDK and `js/supabase-storage.js`.
+   Once configured, uploads in **Admin → Promo/Event** go straight to Supabase
+   Storage and the public URL is what's saved on the promo record — until then,
+   uploads fall back to local base64 storage so the flow keeps working in the demo.
 
-Config sudah ditanam di `js/config.js`. Kalau mau ganti project Firebase/Supabase, cukup edit file itu saja — tidak perlu ubah file lain.
+### Members / check-ins / packages (Firestore)
+These now run on real Firestore automatically once `js/firebase-config.js`
+has real values (same config used for Auth) — no extra code changes
+needed. Collections used:
+- `members` — doc ID is the Member ID itself (e.g. `members/360-AU6H7S`)
+- `checkins` — one auto-ID doc per visit
+- `promos_events` — one auto-ID doc per promo/event
+- `config/pricing` — `{ packageGroups: [...] }`
+- `config/discounts` — `{ discountTiers: [...] }`
 
-⚠️ Jangan lupa tambahkan domain hosting baru ke **Firebase Console → Authentication → Settings → Authorized domains**, supaya login admin tidak error `auth/unauthorized-domain`.
+The first time an admin visits with Firebase configured, these collections
+are auto-seeded with the same demo content used in the local fallback, so
+there's something to explore immediately. Paste `firestore.rules` (in this
+folder) into **Firebase Console → Firestore Database → Rules** — it lets
+members look up their own ID (passwordless login) and the public site read
+promos/pricing, while all writes require the signed-in admin account.
 
-## Halaman & Alur Login
+When Firebase ISN'T configured, everything transparently falls back to the
+original localStorage-only demo store — same function names, same
+behavior, just per-browser instead of shared.
 
-- Pengunjung biasa → `index.html` → klik "Login" → `login.html` (pakai kode member) → masuk ke `member.html`
-- Staff/Admin → dari `login.html` klik "Staff / Admin Login" → `admin-login.html` (email+password) → masuk ke `admin.html`
-- `member.html` dan `admin.html` otomatis redirect balik ke halaman login masing-masing kalau sesi belum/tidak valid
+## Data layer (important)
 
-## Catatan Migrasi dari Versi 1-File
+The PRD calls for **Firebase Authentication** (admin login) and **Firestore**
+(`members`, `checkins`, `promos_events` collections). Since this build has no
+Firebase project/credentials attached, `js/store.js` implements the same
+collections and function signatures on top of `localStorage`, so every flow in
+the PRD is fully clickable end-to-end:
 
-Versi sebelumnya adalah single-page app (SPA) — semua "halaman" sebenarnya `<div>` yang disembunyikan/ditampilkan pakai JavaScript dalam satu file. Versi ini benar-benar memecahnya jadi halaman terpisah, dengan penyesuaian:
+- `members`, `checkins`, `promos_events`, `membership_packages`, `discount_tiers`
+- Member ID auto-generation
+- CSV export with month/year filename pattern (`members_January_2026.csv`)
+- Digital card render + PNG export (1080×1350, via `html2canvas`) + WhatsApp handoff
+- QR check-in — manual entry works everywhere; **camera scanning** (via `jsQR`)
+  needs the page served over `http(s)` with camera permission (not `file://`)
 
-- Sesi login member disimpan di `sessionStorage` (bukan variabel JS biasa) supaya tetap "ingat" saat pindah halaman
-- Sesi login admin memakai Firebase Auth (otomatis persistent di browser)
-- Semua gambar base64 raksasa diekstrak jadi file asli di `assets/images/` — lebih ringan dan bisa di-cache browser
+**To connect real Firebase:**
+1. Add the Firebase SDK + your project config to each HTML page.
+2. In `js/store.js`, swap `Auth.loginAdmin/logoutAdmin` for
+   `signInWithEmailAndPassword` / `signOut`.
+3. Swap the `DB.*` functions for Firestore reads/writes
+   (`getDocs`, `addDoc`, `setDoc`, `deleteDoc`, `onSnapshot`) — the function
+   names and return shapes used by `admin.js` / `member.js` / `index.html`
+   can stay the same, so the UI does not need to change.
+4. Swap the promo "upload" (currently stored as a base64 data URL) for
+   Firebase Storage, and store the resulting download URL on the
+   `promos_events` doc instead.
+
+## Open items carried over from the PRD (section 21)
+
+These were left unspecified in the source requirement, so this build uses
+clearly-labelled placeholders you should confirm before going live:
+- Final logo/asset polish, tagline copy
+- Real membership pricing & package list (`DB.packages()` in `js/store.js`)
+- The 5 discount tier percentages (`DB.discountTiers()` in `js/store.js`)
+- Final Member ID format (`360-MV0001` pattern used here)
+- WhatsApp message wording for join requests / card sharing
+- Real promo/event content (seeded with 2 placeholder items)
+
+## Design
+
+- Palette: matte black, white, grey, soft gold (see `:root` in `css/style.css`)
+- Type: Poppins (display), Inter (body), JetBrains Mono (IDs/data/labels)
+- Signature element: the hero "Orbit" — concentric rings echoing the 360 logo,
+  with cursor-parallax on desktop and a graceful static fallback on mobile.

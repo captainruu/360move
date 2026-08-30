@@ -3,427 +3,321 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard – Dash Gym Bali</title>
-<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/images/favicon-180.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/admin.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<title>Admin Dashboard — 360 MOVE Uluwatu</title>
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32">
+<link rel="icon" href="assets/favicon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/favicon-180.png">
+<link rel="stylesheet" href="css/style.css?v=17">
 </head>
 <body>
 
-<div id="admin-page">
-  <div class="admin-sidebar">
-    <div class="logo">
-      <img src="assets/images/logo-gold.png" alt="DASH" onerror="this.style.display='none'">
+<div class="admin">
+  <aside class="admin-side">
+    <div class="admin-brand">
+      <img src="assets/logo.png" alt="360 MOVE logo">
+      <span>360 MOVE Admin</span>
     </div>
-    <ul class="admin-nav">
-      <li><button class="active" onclick="adminTab('overview')" id="tab-overview">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        <span> Overview</span></button></li>
-      <li><button onclick="adminTab('members')" id="tab-members">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-        <span> Members</span></button></li>
-      <li><button onclick="adminTab('addmember')" id="tab-addmember">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="12" y1="14" x2="12" y2="20"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
-        <span> Add Member</span></button></li>
-      <li><button onclick="adminTab('pricing')" id="tab-pricing">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-        <span> Pricing</span></button></li>
-      <li><button onclick="adminTab('promo')" id="tab-promo">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        <span> Promo</span></button></li>
-      <li><button onclick="adminTab('checkin')" id="tab-checkin">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        <span> Check-in</span></button></li>
-      <li><button onclick="adminTab('scan')" id="tab-scan">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 7 23 1 17 1"/><line x1="16" y1="8" x2="23" y2="1"/><polyline points="1 17 1 23 7 23"/><line x1="8" y1="16" x2="1" y2="23"/><polyline points="23 17 23 23 17 23"/><line x1="16" y1="16" x2="23" y2="23"/><polyline points="1 7 1 1 7 1"/><line x1="8" y1="8" x2="1" y2="1"/></svg>
-        <span> Scan QR</span></button></li>
-      <li style="margin-top:auto;"><button onclick="doLogout()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        <span> Logout</span></button></li>
-    </ul>
-  </div>
-  <div class="admin-main">
-    <!-- OVERVIEW -->
-    <div id="admin-overview">
-      <div class="admin-top">
-        <h2 class="admin-page-title">Dashboard</h2>
-        <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
-          <select id="csvMonth" style="background:var(--dark2);border:1px solid var(--border);color:var(--white);padding:.4rem .7rem;font-size:12px;font-family:var(--font-cond);outline:none;"><option value="">All Months</option><option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option><option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option><option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option></select>
-          <select id="csvYear" style="background:var(--dark2);border:1px solid var(--border);color:var(--white);padding:.4rem .7rem;font-size:12px;font-family:var(--font-cond);outline:none;"><option value="">All Years</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option></select>
-          <button class="btn btn-primary btn-sm" onclick="exportMembers()">Download CSV</button>
+    <nav class="admin-nav" id="adminNav">
+      <button data-panel="overview" class="is-active">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V10M12 19V5M20 19v-7"/></svg>
+        Overview
+      </button>
+      <button data-panel="members">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 19a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="8.5" r="2.6"/><path d="M15.7 12a5.5 5.5 0 0 1 5.8 5.4"/></svg>
+        Members
+      </button>
+      <button data-panel="checkin">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M20 14v3h-3M20 21h-3"/></svg>
+        Check-in
+      </button>
+      <button data-panel="promo">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 19 4v16L3 13Z"/><path d="M7 13v5a2 2 0 0 0 2 2h1v-6"/></svg>
+        Promo / Event
+      </button>
+      <button data-panel="pricing">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Pricing
+      </button>
+    </nav>
+    <div class="admin-foot">
+      <div class="who" id="whoAmI"></div>
+      <button class="btn btn-line btn-block btn-sm" id="logoutBtn">Log Out</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+
+    <!-- ============ OVERVIEW ============ -->
+    <section class="admin-panel is-active" id="panel-overview">
+      <div class="admin-topbar">
+        <div>
+          <h1>Overview</h1>
+          <p>Membership &amp; check-in activity at a glance.</p>
+        </div>
+        <div class="filter-row">
+          <select id="ovMonth"></select>
+          <select id="ovYear"></select>
+          <button class="btn btn-line btn-sm" id="ovDownload">⬇ Download</button>
+          <button class="btn btn-gold btn-sm" id="ovExport">Export CSV</button>
         </div>
       </div>
-      <div id="expiredNotif" class="notification-bar" style="display:none;">
-        <svg class="notif-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <span class="notif-text" id="expiredNotifText"></span>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="n" id="statTotal">0</div><div class="l">Total Members</div></div>
+        <div class="stat-card"><div class="n" id="statActive">0</div><div class="l">Active Members</div></div>
+        <div class="stat-card"><div class="n" id="statExpired">0</div><div class="l">Expired Members</div></div>
+        <div class="stat-card"><div class="n" id="statCheckins">0</div><div class="l">Check-ins in period</div></div>
       </div>
-      <div class="admin-stats">
-        <div class="admin-stat"><div class="admin-stat-num" id="totalMembers">0</div><div class="admin-stat-label">Total Members</div></div>
-        <div class="admin-stat"><div class="admin-stat-num" id="activeMembers">0</div><div class="admin-stat-label">Active</div></div>
-        <div class="admin-stat"><div class="admin-stat-num" id="expiredMembers">0</div><div class="admin-stat-label">Expired</div></div>
-        <div class="admin-stat"><div class="admin-stat-num" id="todayExpired">0</div><div class="admin-stat-label">Expiring Today</div></div>
-      </div>
-      <div class="admin-section">
-        <div class="admin-section-head"><span class="admin-section-title">Recent Members</span></div>
-        <div style="overflow-x:auto;">
-          <table class="admin-table" id="overviewTable">
-            <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Package</th><th>Expiry</th><th>Status</th></tr></thead>
-            <tbody id="overviewTbody"></tbody>
+
+      <div class="card-box">
+        <h3>New members in period</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Member ID</th><th>Name</th><th>Package</th><th>Joined</th></tr></thead>
+            <tbody id="ovMembersBody"></tbody>
           </table>
         </div>
       </div>
-    </div>
-    <!-- MEMBERS -->
-    <div id="admin-members" style="display:none;">
-      <div class="admin-top">
-        <h2 class="admin-page-title">Members</h2>
-        <div style="display:flex;gap:.75rem;">
-          <input type="text" id="searchMember" placeholder="Search..." style="background:var(--dark2);border:1px solid var(--border);color:var(--white);padding:.5rem 1rem;font-size:13px;outline:none;" oninput="renderMembersTable()">
-          <select id="csvMonth2" style="background:var(--dark2);border:1px solid var(--border);color:var(--white);padding:.4rem .7rem;font-size:12px;font-family:var(--font-cond);outline:none;"><option value="">All Months</option><option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option><option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option><option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option></select><select id="csvYear2" style="background:var(--dark2);border:1px solid var(--border);color:var(--white);padding:.4rem .7rem;font-size:12px;font-family:var(--font-cond);outline:none;"><option value="">All Years</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option></select><button class="btn btn-primary btn-sm" onclick="exportMembers(2)">Export CSV</button>
+    </section>
+
+    <!-- ============ MEMBERS ============ -->
+    <section class="admin-panel" id="panel-members">
+      <div class="admin-topbar">
+        <div>
+          <h1>Members</h1>
+          <p>Add, review and manage every member record.</p>
+        </div>
+        <div class="filter-row">
+          <select id="memMonth"></select>
+          <select id="memYear"></select>
+          <button class="btn btn-line btn-sm" id="memDownload">⬇ Download</button>
+          <button class="btn btn-gold btn-sm" id="memExport">Export CSV</button>
+          <button class="btn btn-dark btn-sm" id="addMemberBtn">+ Add Member</button>
         </div>
       </div>
-      <div class="admin-section">
-        <div style="overflow-x:auto;">
-          <table class="admin-table">
-            <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Package</th><th>Start</th><th>Expiry</th><th>Status</th><th>Discount</th><th>Check-ins</th><th>Actions</th></tr></thead>
-            <tbody id="membersTbody"></tbody>
+
+      <div class="card-box">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Member ID</th><th>Name</th><th>Package</th><th>Status</th><th>Expiry</th><th>Card</th><th>Details</th><th></th></tr>
+            </thead>
+            <tbody id="membersBody"></tbody>
           </table>
         </div>
       </div>
-    </div>
-    <!-- ADD MEMBER -->
-    <div id="admin-addmember" style="display:none;">
-      <div class="admin-top"><h2 class="admin-page-title">Add Member</h2></div>
-      <div class="admin-section">
-        <div class="admin-section-head"><span class="admin-section-title">New Member Registration</span></div>
-        <div style="padding:2rem;max-width:500px;">
-          <div class="form-group"><label>Full Name</label><input type="text" id="newName" placeholder="Member name"></div>
-          <div class="form-group"><label>Phone Number</label><input type="text" id="newPhone" placeholder="+62..."></div>
-          <div class="form-group"><label>Package</label><select id="newPkg" onchange="updateNewPrice()"><option value="">-- Select Package --</option></select></div>
-          <div class="form-group"><label>Start Date</label><input type="date" id="newStart"></div>
-          <div class="form-group">
-  <label>Stacked Discount</label>
-  <div class="discount-stack" id="discountStack">
-    <div class="discount-row" id="discRow0">
-      <span class="disc-label">Tier 1</span>
-      <input type="number" class="disc-input" id="disc0" placeholder="0" min="0" max="100" value="0" oninput="recalcDiscount()">
-      <span style="font-size:12px;color:var(--gray);">%</span>
-      <span class="disc-result" id="discResult0"></span>
-    </div>
-  </div>
-  <div style="display:flex;gap:.5rem;margin-top:.5rem;">
-    <button type="button" class="btn-add-disc" onclick="addDiscountTier()">+ Add Tier</button>
-    <span style="font-size:12px;color:var(--gray);align-self:center;" id="discTotal"></span>
-  </div>
-</div>
-          <div style="background:var(--dark3);border:1px solid var(--border);padding:1rem;margin-bottom:1.5rem;">
-            <div style="font-family:var(--font-cond);font-size:13px;color:var(--gray);margin-bottom:.3rem;">Price</div>
-            <div style="font-family:var(--font-head);font-size:28px;color:var(--blue);" id="newPriceDisplay">–</div>
-          </div>
-          <button class="btn btn-primary" onclick="registerMember()" style="justify-content:center;width:100%;">Register Member</button>
+    </section>
+
+    <!-- ============ CHECK-IN ============ -->
+    <section class="admin-panel" id="panel-checkin">
+      <div class="admin-topbar">
+        <div>
+          <h1>✅ Check-in</h1>
+          <p>Scan a member's QR or enter their Member ID manually.</p>
         </div>
       </div>
-      <!-- Generated member preview -->
-      <div id="newMemberResult" style="display:none;padding:2rem 0;">
-        <div class="admin-section">
-          <div class="admin-section-head"><span class="admin-section-title">Member Created</span></div>
-          <div style="padding:2rem;display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start;">
-            <div>
-              <div style="font-family:var(--font-cond);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:.5rem;">Member Code</div>
-              <div style="font-family:var(--font-head);font-size:28px;" id="genCode"></div>
-              <div id="genQR" style="background:white;display:inline-block;padding:12px;margin-top:1rem;"></div>
+
+      <div class="checkin-grid">
+        <div class="card-box">
+          <h3>Scan or enter Member ID</h3>
+          <div class="scan-box" id="scanBox">
+            <video id="scanVideo" playsinline muted style="display:none;"></video>
+            <div class="scan-reticle" id="scanReticle" style="display:none;"></div>
+            <div class="scan-hint" id="scanHint">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="margin:0 auto 10px;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h7v7h-7z"/></svg>
+              Camera scanning starts here.<br>Needs camera permission on a compatible device.
             </div>
-            <div>
-              <div id="genDetails" style="font-size:13px;line-height:2;color:var(--gray);"></div>
+          </div>
+          <button class="btn btn-line btn-block" id="scanToggle" style="margin-top:14px;">📷 Start Camera Scan</button>
+          <p style="font-size:11.5px;color:var(--grey-400);margin-top:8px;text-align:center;">Tip: tap the camera preview to refocus if the code looks blurry.</p>
+          <div class="divider-or">or</div>
+          <form id="manualForm">
+            <div class="field" style="margin-top:0;">
+              <label for="manualId">Member ID</label>
+              <input type="text" id="manualId" class="mono-input" placeholder="e.g. 360-MV0001">
+            </div>
+            <button type="submit" class="btn btn-gold btn-block" style="margin-top:16px;">Look Up Member</button>
+          </form>
+        </div>
+
+        <div>
+          <div class="card-box" style="padding:0;overflow:hidden;">
+            <div class="verify-card" id="verifyCard">
+              <div class="verify-placeholder">Scan a QR or enter a Member ID to see verification details here.</div>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <h3>Today's Check-in Log</h3>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th>Time</th><th>Member</th><th>Package</th><th>Status</th><th></th></tr></thead>
+                <tbody id="dailyLogBody"></tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- PRICING -->
-    <div id="admin-pricing" style="display:none;">
-      <div class="admin-top"><h2 class="admin-page-title">Pricing</h2></div>
-      <div class="admin-section">
-        <div class="admin-section-head"><span class="admin-section-title">Package Prices (IDR)</span><button class="btn btn-primary btn-sm" onclick="savePricing()">Save Changes</button></div>
-        <div style="padding:1.5rem;">
-          <table class="admin-table" id="pricingTable">
-            <thead><tr><th>Package</th><th>Duration</th><th>Price (IDR)</th><th>Promo Text</th></tr></thead>
-            <tbody id="pricingTbody"></tbody>
+    </section>
+
+    <!-- ============ PROMO / EVENT ============ -->
+    <section class="admin-panel" id="panel-promo">
+      <div class="admin-topbar">
+        <div>
+          <h1>Promo / Event</h1>
+          <p>Upload artwork and manage what shows on the public site.</p>
+        </div>
+      </div>
+
+      <div class="card-box">
+        <h3>Add new promo or event</h3>
+        <form id="promoForm">
+          <label class="upload-box" for="promoImg">
+            <div id="uploadPreviewText">Click to upload artwork (JPG/PNG)</div>
+            <img id="uploadPreviewImg" style="display:none;max-height:160px;margin:14px auto 0;border-radius:8px;">
+          </label>
+          <input type="file" id="promoImg" accept="image/*" style="display:none;">
+          <div class="field">
+            <label for="promoTitle">Title</label>
+            <input type="text" id="promoTitle" placeholder="e.g. Anniversary Week">
+          </div>
+          <div class="field">
+            <label for="promoDesc">Description</label>
+            <input type="text" id="promoDesc" placeholder="Short description shown on the site">
+          </div>
+          <button type="submit" class="btn btn-gold" style="margin-top:20px;">Publish to Website</button>
+        </form>
+      </div>
+
+      <div class="card-box">
+        <h3>Live on website</h3>
+        <div class="promo-admin-grid" id="promoAdminGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ PRICING ============ -->
+    <section class="admin-panel" id="panel-pricing">
+      <div class="admin-topbar">
+        <div>
+          <h1>Pricing &amp; Discounts</h1>
+          <p>Edit membership prices and the 5-tier discount system. Changes go live on the public site immediately.</p>
+        </div>
+      </div>
+
+      <div id="pricingGroups"></div>
+
+      <div class="card-box">
+        <h3>Discount Tiers (5 tiers, adjustable)</h3>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Tier</th><th>Label</th><th>Discount %</th></tr></thead>
+            <tbody id="discountBody"></tbody>
           </table>
         </div>
+        <button class="btn btn-gold btn-sm" id="saveDiscountsBtn" style="margin-top:18px;">Save Discount Tiers</button>
       </div>
-    </div>
-    <!-- PROMO -->
-    <div id="admin-promo" style="display:none;">
-      <div class="admin-top"><h2 class="admin-page-title">Promo & Events</h2></div>
-      <div class="admin-section">
-        <div class="admin-section-head"><span class="admin-section-title">Add Promo / Event</span></div>
-        <div style="padding:2rem;max-width:500px;">
-          <div class="form-group"><label>Promo Title</label><input type="text" id="promoTitle" placeholder="e.g. Ramadan Special"></div>
-          <div class="form-group"><label>Description</label><textarea id="promoDesc" rows="3" style="resize:vertical;"></textarea></div>
-          <div class="form-group">
-            <label data-en="Artwork Image" data-id="Gambar Artwork">Artwork Image</label>
-            <input type="file" id="promoImgFile" accept="image/*" onchange="previewPromoImg(event)">
-            <div id="promoImgPreviewWrap" style="display:none;margin-top:.75rem;">
-              <img id="promoImgPreview" style="max-width:100%;max-height:220px;border:1px solid var(--border);display:block;">
-              <button type="button" class="action-btn danger" style="margin-top:.5rem;" onclick="clearPromoImg()">Remove</button>
-            </div>
-            <p style="font-size:11px;color:var(--gray);margin-top:.4rem;">JPG/PNG/WEBP, max 5MB. Or paste an image link instead:</p>
-            <input type="text" id="promoImg" placeholder="https://..." style="margin-top:.4rem;">
-          </div>
-          <div class="form-group"><label>Tag</label><input type="text" id="promoTag" placeholder="e.g. LIMITED TIME"></div>
-          <button class="btn btn-primary" onclick="addPromo()" style="justify-content:center;width:100%;">Publish Promo</button>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ MODAL: Add Member ============ -->
+<div class="modal-veil" id="modalAddMember">
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h2>Add New Member</h2>
+    <form id="addMemberForm">
+      <div class="field" style="margin-top:0;">
+        <label for="nmName">Full name</label>
+        <input type="text" id="nmName" required>
+      </div>
+      <div class="field">
+        <label for="nmPhone">Phone</label>
+        <input type="tel" id="nmPhone" required>
+      </div>
+      <div class="field">
+        <label for="nmPackage">Membership package</label>
+        <select id="nmPackage"></select>
+      </div>
+      <div class="field">
+        <label for="nmDuration">Duration (days)</label>
+        <input type="number" id="nmDuration" value="30" min="1">
+      </div>
+      <div class="field">
+        <label for="nmDiscount">Discount tier</label>
+        <select id="nmDiscount"></select>
+      </div>
+      <button type="submit" class="btn btn-gold btn-block" style="margin-top:24px;">Register &amp; Generate Member ID</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: Member Registered (auto card prompt) ============ -->
+<div class="modal-veil" id="modalRegistered">
+  <div class="modal" style="max-width:420px;text-align:center;">
+    <button class="modal-close" data-close>&times;</button>
+    <div class="ic-ok" style="margin:0 auto 18px;"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h2 style="justify-content:center;">Member Registered</h2>
+    <p style="color:var(--grey-400);font-size:13.5px;margin-bottom:22px;">Member ID <strong style="color:var(--gold);font-family:var(--font-mono);" id="newMemberId"></strong> has been created.</p>
+    <button class="btn btn-gold btn-block" id="genCardBtn">🪪 Generate Digital Card</button>
+  </div>
+</div>
+
+<!-- ============ MODAL: Digital Card ============ -->
+<div class="modal-veil" id="modalCard">
+  <div class="modal" style="max-width:420px;">
+    <button class="modal-close" data-close>&times;</button>
+    <h2>Digital Member Card</h2>
+    <div class="modal-card-wrap">
+      <div class="dcard" id="dcardEl">
+        <div class="dcard-head"><img src="assets/logo.png" alt="logo"><span>360 MOVE</span></div>
+        <div class="dcard-body">
+          <div class="dcard-qr" id="dcardQr"></div>
+          <div class="dcard-status" id="dcardStatus"></div>
+          <div class="dcard-id" id="dcardId"></div>
+          <div class="dcard-name" id="dcardName"></div>
+          <div class="dcard-pkg" id="dcardPkg"></div>
+          <div class="dcard-exp" id="dcardExp"></div>
         </div>
       </div>
-      <div class="admin-section" style="margin-top:1.5rem;">
-        <div class="admin-section-head"><span class="admin-section-title">Active Promos</span></div>
-        <div id="adminPromoList" style="padding:1rem;"></div>
+      <div class="modal-card-actions">
+        <button class="btn btn-gold btn-sm" id="downloadCardBtn">⬇ Download PNG</button>
+        <button class="btn btn-line btn-sm" id="waCardBtn">📱 Send via WhatsApp</button>
       </div>
-    </div>
-    <!-- CHECK-IN -->
-    <div id="admin-checkin" style="display:none;">
-      <div class="admin-top"><h2 class="admin-page-title">Check-in</h2></div>
-
-      <!-- CAMERA + MANUAL INPUT -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
-        <div class="admin-section">
-          <div class="admin-section-head">
-            <span class="admin-section-title" style="display:flex;align-items:center;gap:.4rem;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg> Scan QR</span>
-            <div style="display:flex;gap:.5rem;">
-              <button class="btn btn-primary btn-sm" id="ciStartBtn" onclick="ciStartScanner()">Start Camera</button>
-              <button class="btn btn-outline btn-sm" id="ciStopBtn" onclick="ciStopScanner()" style="display:none;">Stop</button>
-              <button class="btn btn-outline btn-sm" id="ciFlipBtn" onclick="ciFlipCamera()" style="display:none;">Flip</button>
-            </div>
-          </div>
-          <div style="padding:1.5rem;">
-            <div id="ciScannerWrap" style="display:none;position:relative;max-width:360px;margin:0 auto 1rem;">
-              <video id="ciVideo" autoplay playsinline muted style="width:100%;border:2px solid var(--blue3);display:block;background:#000;"></video>
-              <canvas id="ciCanvas" style="display:none;"></canvas>
-              <div style="position:absolute;inset:0;pointer-events:none;">
-                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:180px;height:180px;">
-                  <div style="position:absolute;top:0;left:0;width:28px;height:28px;border-top:3px solid var(--blue);border-left:3px solid var(--blue);"></div>
-                  <div style="position:absolute;top:0;right:0;width:28px;height:28px;border-top:3px solid var(--blue);border-right:3px solid var(--blue);"></div>
-                  <div style="position:absolute;bottom:0;left:0;width:28px;height:28px;border-bottom:3px solid var(--blue);border-left:3px solid var(--blue);"></div>
-                  <div style="position:absolute;bottom:0;right:0;width:28px;height:28px;border-bottom:3px solid var(--blue);border-right:3px solid var(--blue);"></div>
-                  <div style="position:absolute;top:0;left:4px;right:4px;height:2px;background:var(--blue);opacity:.8;animation:scanAnim 2s linear infinite;"></div>
-                </div>
-              </div>
-              <div id="ciScanStatus" style="text-align:center;padding:.5rem;font-family:var(--font-cond);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);background:rgba(0,0,0,.6);">Scanning…</div>
-            </div>
-            <div id="ciNoCam" style="display:none;background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.2);padding:1rem;font-size:13px;color:#eab308;">⚠ Camera not available. Use manual input.</div>
-          </div>
-        </div>
-
-        <div class="admin-section">
-          <div class="admin-section-head"><span class="admin-section-title" style="display:flex;align-items:center;gap:.4rem;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg> Manual Input</span></div>
-          <div style="padding:2rem;">
-            <div class="form-group">
-              <label>Member Code</label>
-              <input type="text" id="ciCode" placeholder="DASH-2025-XXXXXX" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key===\'Enter\')ciLookup()">
-            </div>
-            <button class="btn btn-primary" onclick="ciLookup()" style="width:100%;justify-content:center;">Look Up Member</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- CHECK-IN RESULT CARD -->
-      <div id="ciResultWrap" style="display:none;" class="admin-section">
-        <div style="padding:2rem;" id="ciResultInner"></div>
-      </div>
-
-      <!-- TODAY LOG -->
-      <div class="admin-section">
-        <div class="admin-section-head"><span class="admin-section-title" style="display:flex;align-items:center;gap:.4rem;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Today's Check-in Log</span><button class="btn btn-outline btn-sm" onclick="renderTodayLog()">Refresh</button></div>
-        <div style="overflow-x:auto;">
-          <table class="admin-table">
-            <thead><tr><th>Time</th><th>Code</th><th>Name</th><th>Package</th><th>Status</th></tr></thead>
-            <tbody id="ciTodayLog"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- SCAN -->
-    <div id="admin-scan" style="display:none;">
-      <div class="admin-top"><h2 class="admin-page-title">Scan QR / Barcode</h2></div>
-
-      <!-- CAMERA SCANNER -->
-      <div class="admin-section" style="margin-bottom:1.5rem;">
-        <div class="admin-section-head">
-          <span class="admin-section-title" style="display:flex;align-items:center;gap:.4rem;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg> Camera Scanner</span>
-          <div style="display:flex;gap:.5rem;">
-            <button class="btn btn-primary btn-sm" id="startScanBtn" onclick="startScanner()">Start Camera</button>
-            <button class="btn btn-outline btn-sm" id="stopScanBtn" onclick="stopScanner()" style="display:none;">Stop Camera</button>
-            <button class="btn btn-outline btn-sm" id="flipCamBtn" onclick="flipCamera()" style="display:none;">Flip Camera</button>
-          </div>
-        </div>
-        <div style="padding:1.5rem;">
-          <!-- Camera viewfinder -->
-          <div id="scannerWrap" style="display:none;position:relative;max-width:400px;margin:0 auto 1rem;">
-            <video id="scanVideo" autoplay playsinline muted style="width:100%;border:2px solid var(--blue3);display:block;background:#000;"></video>
-            <canvas id="scanCanvas" style="display:none;"></canvas>
-            <!-- Targeting overlay -->
-            <div style="position:absolute;inset:0;pointer-events:none;">
-              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;">
-                <div style="position:absolute;top:0;left:0;width:32px;height:32px;border-top:3px solid var(--blue);border-left:3px solid var(--blue);"></div>
-                <div style="position:absolute;top:0;right:0;width:32px;height:32px;border-top:3px solid var(--blue);border-right:3px solid var(--blue);"></div>
-                <div style="position:absolute;bottom:0;left:0;width:32px;height:32px;border-bottom:3px solid var(--blue);border-left:3px solid var(--blue);"></div>
-                <div style="position:absolute;bottom:0;right:0;width:32px;height:32px;border-bottom:3px solid var(--blue);border-right:3px solid var(--blue);"></div>
-                <div id="scanLine" style="position:absolute;top:0;left:4px;right:4px;height:2px;background:var(--blue);opacity:.8;animation:scanAnim 2s linear infinite;"></div>
-              </div>
-            </div>
-            <div id="scanStatus" style="text-align:center;padding:.6rem;font-family:var(--font-cond);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);background:rgba(0,0,0,.6);">Scanning… point camera at QR code</div>
-          </div>
-          <!-- No camera notice -->
-          <div id="noCameraNotice" style="display:none;background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.2);padding:1rem;font-size:13px;color:#eab308;">
-            ⚠ Camera not available or permission denied. Please use manual lookup below.
-          </div>
-        </div>
-      </div>
-
-      <!-- MANUAL LOOKUP -->
-      <div class="admin-section">
-        <div class="admin-section-head"><span class="admin-section-title" style="display:flex;align-items:center;gap:.4rem;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg> Manual Code Lookup</span></div>
-        <div style="padding:2rem;max-width:400px;">
-          <div class="form-group">
-            <label>Member Code</label>
-            <input type="text" id="scanCode" placeholder="DASH-2025-XXXXX" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')scanMember()">
-          </div>
-          <button class="btn btn-primary" onclick="scanMember()" style="justify-content:center;width:100%;">Look Up Member</button>
-        </div>
-        <div id="scanResult" style="padding:0 2rem 2rem;"></div>
-      </div>
+      <p style="font-size:11.5px;color:var(--grey-400);text-align:center;">PNG exports at 1080 × 1350px. WhatsApp opens a chat with the member's info — attach the downloaded PNG manually.</p>
     </div>
   </div>
 </div>
 
-<!-- JOIN MODAL -->
-<div id="memberCardModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;align-items:center;justify-content:center;padding:1rem;overflow-y:auto;">
-  <div style="background:var(--dark2);border:1px solid var(--border);width:100%;max-width:520px;position:relative;">
-    <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-family:var(--font-cond);font-size:16px;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Digital Member Card</span>
-      <button onclick="document.getElementById('memberCardModal').style.display='none'" style="background:none;border:none;color:var(--gray);font-size:20px;cursor:pointer;">✕</button>
-    </div>
-    <div style="padding:1.5rem;text-align:center;">
-      <!-- THE CARD — rendered at 540x675 (half of 1080x1350, ratio 4:5) -->
-      <div id="digitalCard" style="width:400px;height:500px;margin:0 auto;position:relative;background:#ffffff;font-family:Arial,sans-serif;overflow:hidden;display:inline-block;">
-        <!-- Black header bar -->
-        <div style="position:absolute;top:0;left:0;right:0;height:96px;background:#0a0a0a;display:flex;align-items:center;justify-content:center;">
-          <img id="dcLogo" src="" alt="DASH" style="height:34px;width:auto;object-fit:contain;">
-        </div>
-        <!-- QR Code -->
-        <div style="position:absolute;top:122px;left:50%;transform:translateX(-50%);z-index:2;">
-          <div id="dcQR" style="background:#fff;padding:8px;border:3px solid #0a0a0a;display:inline-block;"></div>
-        </div>
-        <!-- Member ID label -->
-        <div style="position:absolute;top:293px;left:0;right:0;text-align:center;font-family:Arial,sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#1a1a1a;z-index:2;">Member ID</div>
-        <div id="dcIdLabel" style="position:absolute;top:309px;left:0;right:0;text-align:center;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1a1a1a;z-index:2;"></div>
-        <!-- Member Name -->
-        <div id="dcName" style="position:absolute;top:338px;left:16px;right:16px;text-align:center;font-family:Arial,sans-serif;font-size:22px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:#cfb58c;z-index:2;line-height:1.15;"></div>
-        <!-- Expiry Date -->
-        <div style="position:absolute;top:393px;left:0;right:0;text-align:center;font-family:Arial,sans-serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#1a1a1a;z-index:2;">Expiry Date</div>
-        <div id="dcExpiry" style="position:absolute;top:407px;left:0;right:0;text-align:center;font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#1a1a1a;z-index:2;"></div>
-        <!-- Package -->
-        <div id="dcPkg" style="position:absolute;top:465px;left:0;right:0;text-align:center;font-family:Arial,sans-serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#999;z-index:2;"></div>
-      </div>
-      <div style="margin-top:1.5rem;display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="downloadMemberCard()">⬇ Download PNG</button>
-        <button class="btn btn-outline" onclick="sendCardViaWA()" id="dcWABtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Send via WhatsApp</button>
-      </div>
-      <p style="font-size:11px;color:var(--gray);margin-top:.75rem;line-height:1.6;">Card dimensions: 1080×1350px (4:5) when downloaded</p>
+<!-- ============ MODAL: Member Details & History ============ -->
+<div class="modal-veil" id="modalDetails">
+  <div class="modal">
+    <button class="modal-close" data-close>&times;</button>
+    <h2>Member Details</h2>
+    <div class="detail-grid" id="detailGrid"></div>
+    <h3 style="font-family:var(--font-display);font-size:15px;margin-bottom:12px;">Check-in History</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Date</th><th>Time</th><th>Package</th><th>Status</th><th></th></tr></thead>
+        <tbody id="historyBody"></tbody>
+      </table>
     </div>
   </div>
 </div>
 
-<!-- ==================== MEMBER DETAILS MODAL ==================== -->
-<div id="memberDetailsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;align-items:center;justify-content:center;padding:1rem;overflow-y:auto;">
-  <div style="background:var(--dark2);border:1px solid var(--border);width:100%;max-width:680px;position:relative;">
-    <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-family:var(--font-cond);font-size:16px;letter-spacing:1px;text-transform:uppercase;font-weight:600;" id="detailsModalTitle">Member Details</span>
-      <button onclick="document.getElementById('memberDetailsModal').style.display='none'" style="background:none;border:none;color:var(--gray);font-size:20px;cursor:pointer;">✕</button>
-    </div>
-    <div style="padding:1.5rem;" id="memberDetailsBody">
-      <!-- filled by JS -->
-    </div>
-  </div>
-</div>
-
-<!-- ==================== CHECK-IN POPUP (after scan) ==================== -->
-<div id="ciPopupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2500;align-items:center;justify-content:center;padding:1rem;">
-  <div style="background:#ffffff;width:100%;max-width:380px;position:relative;overflow:hidden;border-radius:4px;">
-    <!-- Black top bar with gold logo -->
-    <div style="height:100px;background:#0a0a0a;display:flex;align-items:center;justify-content:center;">
-      <img id="ciPopupLogo" src="" alt="DASH" style="height:36px;width:auto;object-fit:contain;">
-    </div>
-    <div style="padding:2rem 2rem 2rem;text-align:center;background:#ffffff;">
-      <!-- Status badge -->
-      <div id="ciPopupStatus" style="display:inline-block;padding:.5rem 2rem;border-radius:50px;font-family:Arial,sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:1.5rem;"></div>
-      <!-- ID -->
-      <div id="ciPopupId" style="font-family:Arial,sans-serif;font-size:22px;font-weight:700;color:#111;margin-bottom:.3rem;"></div>
-      <!-- Name -->
-      <div id="ciPopupName" style="font-family:Arial,sans-serif;font-size:26px;font-weight:900;color:#cfb58c;margin-bottom:.5rem;"></div>
-      <!-- Phone -->
-      <div id="ciPopupPhone" style="font-family:Arial,sans-serif;font-size:15px;color:#555;margin-bottom:.3rem;"></div>
-      <!-- Expiry -->
-      <div id="ciPopupExpiry" style="font-family:Arial,sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:#e53e3e;margin-bottom:2rem;"></div>
-      <!-- Check-in button -->
-      <button id="ciPopupBtn" onclick="confirmCheckIn()" style="background:#cfb58c;color:#0a0a0a;border:none;padding:.9rem 3rem;border-radius:50px;font-family:Arial,sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;width:100%;max-width:280px;">CHECK IN</button>
-      <div style="margin-top:1rem;">
-        <button onclick="document.getElementById('ciPopupModal').style.display='none'" style="background:none;border:none;color:#888;font-size:13px;cursor:pointer;letter-spacing:1px;">CANCEL</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div id="toast" class="toast"></div>
-
-<script type="module">
-  import { setLang, initModalOverlayClose } from './js/utils.js';
-  import { doLogout, requireAdminAuth } from './js/auth.js';
-  import { adminTab, renderAdmin } from './js/admin-core.js';
-  import {
-    renderMembersTable, showMemberDetails, recalcDiscount, addDiscountTier, removeDiscountTier, updateNewPrice,
-    registerMember, extendMember, editDiscount, edRecalc, edAddTier, edRemoveTier,
-    saveEditDiscount, deleteMember, exportMembers
-  } from './js/admin-members.js';
-  import { savePricing } from './js/admin-pricing.js';
-  import { previewPromoImg, clearPromoImg, addPromo, deletePromo } from './js/admin-promo.js';
-  import {
-    scanMember, ciStartScanner, ciStopScanner, ciFlipCamera, ciLookup, confirmCheckIn, renderTodayLog,
-    startScanner, stopScanner, flipCamera, maybeAutoStartScanner
-  } from './js/admin-checkin.js';
-  import { showDigitalCard, downloadMemberCard, sendCardViaWA } from './js/card-generator.js';
-
-  // Expose everything referenced from inline onclick="" handlers
-  window.setLang=setLang; window.doLogout=doLogout;
-  window.adminTab=adminTab;
-  window.renderMembersTable=renderMembersTable;
-  window.showMemberDetails=showMemberDetails;
-  window.recalcDiscount=recalcDiscount; window.addDiscountTier=addDiscountTier; window.removeDiscountTier=removeDiscountTier; window.updateNewPrice=updateNewPrice;
-  window.registerMember=registerMember; window.extendMember=extendMember; window.editDiscount=editDiscount;
-  window.edRecalc=edRecalc; window.edAddTier=edAddTier; window.edRemoveTier=edRemoveTier; window.saveEditDiscount=saveEditDiscount;
-  window.deleteMember=deleteMember; window.exportMembers=exportMembers;
-  window.savePricing=savePricing;
-  window.previewPromoImg=previewPromoImg; window.clearPromoImg=clearPromoImg; window.addPromo=addPromo; window.deletePromo=deletePromo;
-  window.ciStartScanner=ciStartScanner; window.ciStopScanner=ciStopScanner; window.ciFlipCamera=ciFlipCamera; window.ciLookup=ciLookup; window.confirmCheckIn=confirmCheckIn; window.renderTodayLog=renderTodayLog;
-  window.startScanner=startScanner; window.stopScanner=stopScanner; window.flipCamera=flipCamera; window.maybeAutoStartScanner=maybeAutoStartScanner; window.scanMember=scanMember;
-  window.showDigitalCard=showDigitalCard; window.downloadMemberCard=downloadMemberCard; window.sendCardViaWA=sendCardViaWA;
-
-  initModalOverlayClose();
-
-  // Page guard: redirects to admin-login.html if not signed in
-  requireAdminAuth().then((user)=>{
-    if(!user) return; // already redirected
-    renderAdmin();
-  });
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/firebase-config.js?v=17"></script>
+<script src="js/firebase-init.js?v=17"></script>
+<script src="js/store.js?v=17"></script>
+<script src="js/firebase-auth.js?v=17"></script>
+<script src="js/supabase-config.js?v=17"></script>
+<script src="js/supabase-storage.js?v=17"></script>
+<script src="js/admin.js?v=17"></script>
 </body>
 </html>
